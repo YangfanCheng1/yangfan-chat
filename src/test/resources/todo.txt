@@ -1,0 +1,2 @@
+1. createNewRoomWithUser(), when sending message to another user's queue. message shouldn't be null
+2.
