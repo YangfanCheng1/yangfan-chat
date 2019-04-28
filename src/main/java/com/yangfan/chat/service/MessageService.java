@@ -10,6 +10,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,22 +21,26 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final Object mutex = new Object();
-    private final Object mutex2 = new Object();
 
-    private final PrivateRoomRepository privateRoomRepository;
-    private final MessageRepository messageRepository;
-    private final PrivateMessageRepository privateMessageRepository;
-    public MessageService(PrivateRoomRepository privateRoomRepository,
-                          MessageRepository messageRepository,
-                          PrivateMessageRepository privateMessageRepository) {
-        this.privateRoomRepository = privateRoomRepository;
-        this.messageRepository = messageRepository;
-        this.privateMessageRepository = privateMessageRepository;
+    private final EntityManager entityManager;
+    private final PrivateRoomRepository privateRoomRepo;
+    private final MessageRepository messageRepo;
+    private final PrivateMessageRepository privateMessageRepo;
+    private final ApplicationEventListener ael;
+    public MessageService(EntityManager entityManager,
+                          PrivateRoomRepository privateRoomRepo,
+                          MessageRepository messageRepo,
+                          PrivateMessageRepository privateMessageRepo,
+                          ApplicationEventListener ael) {
+        this.entityManager = entityManager;
+        this.privateRoomRepo = privateRoomRepo;
+        this.messageRepo = messageRepo;
+        this.privateMessageRepo = privateMessageRepo;
+        this.ael = ael;
     }
 
-    private Queue<Message> buffer = new ArrayDeque<>(MESSAGE_THRESHOLD);
-    private Deque<PrivateMessage> buffer2 = new ArrayDeque<>(MESSAGE_THRESHOLD);
     private static final int MESSAGE_THRESHOLD = 5;
+    private Deque<PrivateMessage> buffer = new ArrayDeque<>(MESSAGE_THRESHOLD);
 
     public void handleEvent(EventMessage event) {
         switch (event.getAction()) {
@@ -43,7 +49,7 @@ public class MessageService {
                         .user1(new User(event.getFromUserId()))
                         .user2(new User(event.getToUserId()))
                         .build();
-                privateRoomRepository.save(newPrivateRoom);
+                privateRoomRepo.save(newPrivateRoom);
             case "DELETE":
                 //...
             default:
@@ -55,7 +61,7 @@ public class MessageService {
         if (activeRoom.isPrivate()) {
             User user1 = new User(activeRoom.getFromUserId());
             User user2 = new User(activeRoom.getToUserId());
-            List<PrivateMessage> pms = privateMessageRepository.findMessages(user1, user2);
+            List<PrivateMessage> pms = privateMessageRepo.findMessages(user1, user2);
             return pms.stream()
                     .map(privateMessage -> MessageDto.builder()
                         .fromUserId(privateMessage.getFromUser().getUserId())
@@ -64,7 +70,7 @@ public class MessageService {
                         .message(privateMessage.getMessage()).build())
                     .collect(Collectors.toList());
         } else {
-            List<Message> messages = messageRepository.findByRoomOrderByIdDesc(new Room(activeRoom.getRoomId()));
+            List<Message> messages = messageRepo.findByRoomOrderByIdDesc(new Room(activeRoom.getRoomId()));
             return messages.stream()
                     .map(message -> MessageDto.builder()
                         .fromUserId(message.getUser().getUserId())
@@ -75,6 +81,7 @@ public class MessageService {
         }
     }
 
+    @Transactional
     public void add(GroupChatMessage groupChatMessage) {
         Room room = new Room();
         room.setRoomId(groupChatMessage.getRoomId());
@@ -84,70 +91,63 @@ public class MessageService {
                 .room(room).user(user).message(groupChatMessage.getMessage()).timestamp(Instant.now())
                 .build();
 
-        synchronized (mutex) {
-            buffer.offer(message);
-        }
+        entityManager.persist(message);
     }
 
+    /**
+     * case 1: only one user logs in, message is persisted into database right away (infrequent)
+     * case 2: user logs out, clear buffer
+     * case 3: both users log in, message is saved to buffer (frequent)
+     */
     public void add(PrivateChatMessage privateChatMessage) {
         User fromUser = new User();
         fromUser.setUserId(privateChatMessage.getFromUserId());
         User toUser = new User();
         toUser.setUserId(privateChatMessage.getToUserId());
+        Instant now = Instant.now();
         PrivateMessage message = PrivateMessage.builder()
-                .fromUser(fromUser).toUser(toUser).message(privateChatMessage.getMessage()).timestamp(Instant.now())
-                .build();
+                .fromUser(fromUser)
+                .toUser(toUser)
+                .message(privateChatMessage.getMessage())
+                .timestamp(privateChatMessage.getTimestamp()).build();
 
-        synchronized (mutex) {
-            buffer2.offer(message);
+        // If toUser isn't in session
+        if (!ael.hasUser(ael.getLoggedInUsers(), toUser.getUsername())) {
+            // If toUser disconnects from listening to queue
+            if (ael.hasUser(ael.getLoggedOutUsers(), toUser.getUsername())) {
+                clearPrivateMessageBuffer();
+                ael.getLoggedOutUsers().remove(toUser.getUsername());
+            }
+
+            privateMessageRepo.save(message);
+        } else {
+            synchronized (mutex) {
+                buffer.offer(message);
+            }
         }
     }
 
     @Scheduled(cron = "0 0/5 * * * ?")
-    public void saveAndClear() {
+    public void clearPrivateMessageBuffer() {
         synchronized (mutex) {
             if (buffer.size() < MESSAGE_THRESHOLD) {
                 return;
             }
 
-            List<Message> clonedMessageList = new ArrayList<>(buffer.size());
+            List<PrivateMessage> clonedMessageList = new ArrayList<>(buffer.size());
             while (!buffer.isEmpty()) {
                 clonedMessageList.add(buffer.poll());
             }
             log.info("buffer cleared");
-
-            save(clonedMessageList);
-        }
-    }
-
-    @Scheduled(cron = "0 0/6 * * * ?")
-    public void savePrivateMessages() {
-        synchronized (mutex2) {
-            if (buffer2.size() < MESSAGE_THRESHOLD) {
-                return;
-            }
-
-            List<PrivateMessage> clonedMessageList = new ArrayList<>(buffer2.size());
-            while (!buffer2.isEmpty()) {
-                clonedMessageList.add(buffer2.poll());
-            }
-            log.info("buffer2 cleared");
 
             savePrivateMessages(clonedMessageList);
         }
     }
 
     @Async
-    private <E extends Message> void save(List<E> list) {
-        messageRepository.saveAll(list);
-        log.info("list of {} elems saved", list.size());
-    }
-
-    @Async
     private void savePrivateMessages(List<PrivateMessage> list) {
-        privateMessageRepository.saveAll(list);
+        privateMessageRepo.saveAll(list);
         log.info("list of {} elems saved", list.size());
     }
 
-    // TODO save right away when user disconnects
 }

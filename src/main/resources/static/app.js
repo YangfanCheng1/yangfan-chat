@@ -18,10 +18,9 @@ $(function () {
     });
 
     $("#send-message").click(function() {
-        message = $("#message").val();
-
-        sendMessage(message);
-        $("#message").val("");
+        let message = $("#message").val();
+        let roomName = $("#target-room-profile").text();
+        sendMessage(message, roomName);
         scrollToBottom();
     });
 
@@ -95,10 +94,10 @@ function changeActiveRoom(id, isPrivate, name) {
     console.log("Switched to " + activeRoom.displayName);
 }
 
-function sendMessage(message) {
+function sendMessage(message, roomName) {
     (activeRoom.isPrivate)
-    ? client.sendPrivateMessage(user.userId, message, activeRoom.displayId, user.username)
-    : client.sendGroupMessage(user.userId, message, activeRoom.displayId);
+    ? client.sendPrivateMessage(new PrivateMessage(user.userId, activeRoom.displayId, message, user.username, roomName))
+    : client.sendGroupMessage(new GroupMessage(user.userId, message, activeRoom.displayId, user.username));
 }
 
 function createNewPrivateRoom(id, isPrivate, name) {
@@ -109,7 +108,9 @@ function createNewPrivateRoom(id, isPrivate, name) {
 }
 
 
-/*---- ajax ----*/
+/*---------------------
+        ajax
+----------------------*/
 
 function init(username) {
     $.ajax({

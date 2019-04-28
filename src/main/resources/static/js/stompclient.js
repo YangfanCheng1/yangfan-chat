@@ -43,22 +43,20 @@ class StompClient {
         });
     }
 
-    sendPrivateMessage(fromUserId, message, toUserId, fromUserName) {
-        displayPrivateChatMessage(new PrivateMessage(fromUserId, toUserId, message, fromUserName));
-        this.client.send("/chat-app/private/" + toUserId, {}
-            ,JSON.stringify(new PrivateMessage(fromUserId, toUserId, message, fromUserName))
+    sendPrivateMessage(privateMessage) {
+        displayPrivateChatMessage(privateMessage);
+        this.client.send(
+            "/chat-app/private/" + privateMessage.toUserId
+            ,{}
+            ,JSON.stringify(privateMessage)
         );
     }
 
-    sendGroupMessage(fromUserId, message, roomId) {
+    sendGroupMessage(groupMessage) {
         // client.send("/queue/test", {priority: 9}, "Hello, STOMP");
-        if (this.connected != true) {
-            alert("You must connect first!");
-            return;
-        }
-
-        this.client.send("/chat-app/group/" + roomId, {}
-            ,JSON.stringify(new Message(fromUserId, roomId, message))
+        this.client.send("/chat-app/group/" + groupMessage.roomId
+            ,{}
+            ,JSON.stringify(groupMessage)
         );
 
     }
@@ -87,20 +85,22 @@ class User{
     }
 }
 
-class Message {
-    constructor(userId, roomId, message) {
+class GroupMessage {
+    constructor(userId, roomId, message, fromUserName) {
         this.userId = userId;
         this.message = message;
         this.roomId = roomId;
+        this.fromUserName = fromUserName;
     }
 }
 
 // {fromUserId, toUserId, message}
 class PrivateMessage {
-    constructor(fromUserId, toUserId, message, fromUserName) {
+    constructor(fromUserId, toUserId, message, fromUserName, toUserName) {
         this.fromUserId = fromUserId;
         this.fromUserName = fromUserName;
         this.toUserId = toUserId;
+        this.toUserName = toUserName;
         this.message = message;
     }
 }
