@@ -32,13 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated().and()
             .formLogin()
                 .loginPage("/log-in")
-////                .loginProcessingUrl("/log-in-verify")
-////                    .usernameParameter("username")
-//                    .successForwardUrl("/test")
-//                    .failureForwardUrl("/test")
                 .permitAll().and()
             .logout().permitAll();
-
     }
 
     @Override

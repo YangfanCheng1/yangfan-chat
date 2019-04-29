@@ -7,6 +7,9 @@ app:
 
 spring:
   jpa:
+#    properties:
+#      hibernate:
+#        format_sql: true
     hibernate:
       ddl-auto: none
       dialect: org.hibernate.dialect.MySQL5Dialect

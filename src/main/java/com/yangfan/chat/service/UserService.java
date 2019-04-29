@@ -109,8 +109,8 @@ public class UserService {
         user0.getRooms().add(savedRoom);
         user1.getRooms().add(savedRoom);
 
-        this.saveUser(user0);
-        this.saveUser(user1);
+        userRepository.save(user0);
+        userRepository.save(user1);
 
         return savedRoom;
     }
@@ -140,11 +140,4 @@ public class UserService {
         return room;
     }
 
-    private User saveUser(User user) {
-        return userRepository.save(user);
-    }
-
-    public String test(String ok) {
-        return ok;
-    }
 }

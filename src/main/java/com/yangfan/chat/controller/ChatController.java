@@ -12,6 +12,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.time.Instant;
 
 @Slf4j
 @Controller
@@ -33,9 +34,10 @@ public class ChatController {
     @MessageMapping("/private/{toUserId}")
     @SendTo("/topic/private.{toUserId}") //stomclient to subscribe to
     public PrivateChatMessage sendPrivateMessage(@Payload PrivateChatMessage privateChatMessage) {
+        privateChatMessage.setTimestamp(Instant.now());
         messageService.add(privateChatMessage);
 
-        log.info("private message [{}] sent to {}", privateChatMessage.getMessage(), privateChatMessage.getToUserId());
+        log.info("private message '{}' sent to '{}'", privateChatMessage.getMessage(), privateChatMessage.getToUserId());
         return privateChatMessage;
     }
 
@@ -44,7 +46,7 @@ public class ChatController {
     public GroupChatMessage sendGroupMessage(@Payload GroupChatMessage groupChatMessage) {
         messageService.add(groupChatMessage);
 
-        log.info("group message [{}] sent to {}", groupChatMessage.getMessage(), groupChatMessage.getRoomId());
+        log.info("group message '{}' sent to '{}'", groupChatMessage.getMessage(), groupChatMessage.getRoomId());
         return groupChatMessage;
     }
 
