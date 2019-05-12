@@ -104,7 +104,6 @@ public class MessageService {
         fromUser.setUserId(privateChatMessage.getFromUserId());
         User toUser = new User();
         toUser.setUserId(privateChatMessage.getToUserId());
-        Instant now = Instant.now();
         PrivateMessage message = PrivateMessage.builder()
                 .fromUser(fromUser)
                 .toUser(toUser)
@@ -115,10 +114,11 @@ public class MessageService {
         if (!ael.hasUser(ael.getLoggedInUsers(), toUser.getUsername())) {
             // If toUser disconnects from listening to queue
             if (ael.hasUser(ael.getLoggedOutUsers(), toUser.getUsername())) {
-                clearPrivateMessageBuffer();
+                synchronized (mutex) {
+                    clearBuffer();
+                }
                 ael.getLoggedOutUsers().remove(toUser.getUsername());
             }
-
             privateMessageRepo.save(message);
         } else {
             synchronized (mutex) {
@@ -128,20 +128,22 @@ public class MessageService {
     }
 
     @Scheduled(cron = "0 0/5 * * * ?")
-    public void clearPrivateMessageBuffer() {
+    public void clearIfOverLimit() {
         synchronized (mutex) {
-            if (buffer.size() < MESSAGE_THRESHOLD) {
-                return;
+            if (buffer.size() > MESSAGE_THRESHOLD) {
+                clearBuffer();
             }
-
-            List<PrivateMessage> clonedMessageList = new ArrayList<>(buffer.size());
-            while (!buffer.isEmpty()) {
-                clonedMessageList.add(buffer.poll());
-            }
-            log.info("buffer cleared");
-
-            savePrivateMessages(clonedMessageList);
         }
+    }
+
+    private void clearBuffer() {
+        List<PrivateMessage> clonedMessageList = new ArrayList<>(buffer.size());
+        while (!buffer.isEmpty()) {
+            clonedMessageList.add(buffer.poll());
+        }
+        log.info("buffer cleared");
+
+        savePrivateMessages(clonedMessageList);
     }
 
     @Async

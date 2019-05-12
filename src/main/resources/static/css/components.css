@@ -1,3 +1,9 @@
+/*==== colors ====*/
+black {
+    color: black;
+}
+
+
 input.button {
   width: auto;
   color: white;
@@ -25,6 +31,7 @@ input.button {
 
 .max-height-600 {
   height: 600px;
+  padding: 10px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -51,12 +58,46 @@ input.button {
   margin-bottom: 10px;
 }
 
+/*==== rooms ====*/
+
 .rooms li:hover {
   background: #cccccc;
   cursor: pointer;
 }
 
+/*==== navbar ====*/
+
+.bg-black {
+  background-color: #242729 !important;
+}
+
+.navbar {
+  color: white;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+  font-weight: bold;
+  border: none;
+}
+.navbar ul.nav > li > a {
+  color: white;
+  text-transform: uppercase;
+  padding: 15px;
+}
+.navbar ul.nav > li > a:hover {
+  border-bottom: solid 2px #6aae7a;
+  color: #5cb48e;
+}
+@media (max-width: 800px) {
+  .navbar ul.nav > li > a {
+    padding: unset;
+  }
+  .navbar ul.nav > li > a:hover {
+    border:unset;
+  }
+}
+
 /*==== messages ====*/
+
 .messages li {
   margin: 6px 0;
 }

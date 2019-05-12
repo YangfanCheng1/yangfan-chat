@@ -43,18 +43,16 @@ public class UserService {
      */
     public UserDto getUserDtoByUsername(String username) throws UserNotFoundException {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
-
         List<RoomDto> roomDtos = Stream.of(user.getRooms(), user.getPrivateRooms())
                 .flatMap(Collection::stream)
                 .map(room -> convertToRoomDto(room, user))
                 .collect(Collectors.toList());
-        UserDto userDto = UserDto.builder()
+
+        return UserDto.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .rooms(roomDtos)
                 .build();
-        log.info("{}'s data: {}",username, user);
-        return userDto;
     }
 
     private <E> RoomDto convertToRoomDto(E room, User user) {
@@ -121,7 +119,7 @@ public class UserService {
             throw new DuplicateUserException(username);
         }
         User newUser = new User();
-        Room allRoom = roomRepository.findByRoomName("All").orElse(getNewRoom());
+        Room allRoom = roomRepository.findByRoomName("All").orElseGet(this::getNewRoom);
         newUser.setUsername(username);
         newUser.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword()));
         newUser.setRooms(Collections.singletonList(allRoom));

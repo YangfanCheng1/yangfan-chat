@@ -34,17 +34,17 @@ public class ApiController {
     @Autowired
     private RoomService roomService;
 
-
     // Init user state after sign in
     @GetMapping(path = "/user/{username}", produces = {"application/json"})
     public ResponseEntity<UserDto> getUser(@PathVariable String username) throws UserNotFoundException {
         UserDto userDto = userService.getUserDtoByUsername(username);
+        log.info("Getting {}", userDto);
         return ResponseEntity.ok(userDto);
     }
 
     @GetMapping(path = "/get-all-users-containing", produces = {"application/json"})
     public List<UserDto> getUsersContaining(@RequestParam(value = "keyword") String var1) {
-        log.info("searched item: {}", var1);
+        log.info("Searched item: {}", var1);
         return userService.getUsersContaining(var1);
     }
 
@@ -52,7 +52,8 @@ public class ApiController {
     public List<MessageDto> getChatHistoryPrivate(@RequestParam(required = false) Integer size,
                                                   @RequestParam int fromUserId,
                                                   @RequestParam int toUserId) {
-        log.info("getting chat history");
+        log.info("Getting private chat history");
+
         ActiveRoomDto activeRoom = new ActiveRoomDto();
         activeRoom.setFromUserId(fromUserId);
         activeRoom.setToUserId(toUserId);
@@ -64,7 +65,8 @@ public class ApiController {
     @GetMapping(path = "/chat-history/group", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<MessageDto> getChatHistoryGroup(@RequestParam(required = false) Integer size,
                                                 @RequestParam int roomId) {
-        log.info("getting chat history");
+        log.info("Getting group chat history");
+
         ActiveRoomDto activeRoom = new ActiveRoomDto();
         activeRoom.setRoomId(roomId);
         activeRoom.setPrivate(false);
@@ -81,6 +83,7 @@ public class ApiController {
         String fromUserName = activeRoomDto.getFromUserName();
         String toUserName = activeRoomDto.getToUserName();
         log.info("Creating new room for user '{}' and '{}'", fromUserName, toUserName);
+
         if (roomService.addNewPrivateRoom(activeRoomDto)) {
             return new Response(
                     HttpStatus.OK.value(),
