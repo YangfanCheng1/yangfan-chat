@@ -22,8 +22,8 @@ function displayChat(displayId, isPrivate) {
             let label = "";
             if (curName != msg.fromUserName) {
                 label = (isSelf)
-                ? `<div>${msg.fromUserName} ${msg.timestamp}</div>`
-                : `<div class='right-align'>${msg.fromUserName} ${msg.timestamp}</div>`;
+                ? `<div>${msg.fromUserName}</div>`
+                : `<div class='right-align'>${msg.fromUserName}</div>`;
                 curName = msg.fromUserName;
             }
 
@@ -33,6 +33,8 @@ function displayChat(displayId, isPrivate) {
         }
         $("#chat-text-area ul").html(chatHtml);
     }
+
+    scrollToBottom();
 }
 
 // <-- {userId, roomId, message, timestamp}
@@ -95,7 +97,7 @@ function displayPrivateChatMessage(messageData) {
 }
 
 function scrollToBottom() {
-    var chatArea = $("#chat-text-area")
+    var chatArea = $("#chat-text-area");
     chatArea.animate({ scrollTop: chatArea.prop('scrollHeight')}, 1000);
 }
 
