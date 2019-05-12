@@ -31,5 +31,6 @@ server:
   servlet:
     session:
       timeout: 10
+  port: 5000
 
 
