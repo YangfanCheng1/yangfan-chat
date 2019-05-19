@@ -97,7 +97,7 @@ function changeActiveRoom(id, isPrivate, name) {
 function sendMessage(message, roomName) {
     (activeRoom.isPrivate)
     ? client.sendPrivateMessage(new PrivateMessage(user.userId, activeRoom.displayId, message, user.username, roomName))
-    : client.sendGroupMessage(new GroupMessage(user.userId, message, activeRoom.displayId, user.username));
+    : client.sendGroupMessage(new GroupMessage(user.userId, activeRoom.displayId, message, user.username));
 }
 
 function createNewPrivateRoom(id, isPrivate, name) {
@@ -180,7 +180,6 @@ function getRoomChatHistory(curRoom, isPrivate, id) {
     .catch(error => console.error('Error:', error));
 }
 
-
 /*
 --> private: curRoom = {}
 */
@@ -193,7 +192,6 @@ function addNewRoom(id, isPrivate, name) {
         "Content-Type" : "application/json"
     })
 
-    console.log(csrf_header + ":" + csrf_token);
     fetch('/api/room', {
         method: "POST",
         cache: "no-cache",

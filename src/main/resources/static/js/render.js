@@ -39,22 +39,34 @@ function displayChat(displayId, isPrivate) {
 
 // <-- {userId, roomId, message, timestamp}
 function displayGroupChatMessage(messageData) {
-    const userId = messageData.userId;
+    const userId = messageData.fromUserId;
+    const fromUserName = messageData.fromUserName;
     const roomId = messageData.roomId;
     const message = messageData.message;
     const timestamp = messageData.timestamp;
 
-    if (messageData.roomId == activeRoom.displayId) {
-        (messageData.userId == this.user.userId)
-        ? $("#chat-text-area ul").append("<li><span>" + message + "</span></li>")
-        : $("#chat-text-area ul").append("<li class='right-align'><span>" + message + "<span></li>");
+    if (roomId == activeRoom.displayId) {
+        if (userId == this.user.userId) {
+            $("#chat-text-area ul").append(
+                `<li>
+                    <div>${fromUserName}</div>
+                    <span>${message}<span>
+                </li>`);
+        } else {
+            $("#chat-text-area ul").append(
+                `<li class='right-align'>
+                    <div class='right-align'>${fromUserName}</div>
+                    <span>${message}<span>
+                </li>`);
+        }
+        scrollToBottom();
     }
 
     if (groupChatMap.has(roomId)) {
-        groupChatMap.get(roomId).push({userId: userId, message: message, timestamp: timestamp});
+        groupChatMap.get(roomId).push({fromUserId:userId, roomId:roomId, message: message, fromUserName: fromUserName});
     } else {
         let arr = [];
-        arr.push({userId: userId, message: message, timestamp: timestamp});
+        arr.push({fromUserId:userId, roomId:roomId, message: message, fromUserName: fromUserName});
         groupChatMap.set(roomId, arr);
     }
 }
@@ -73,9 +85,20 @@ function displayPrivateChatMessage(messageData) {
     // Render if user is in activeRoom
     if ((messageData.fromUserId == activeRoom.displayId || messageData.toUserId == activeRoom.displayId)
          && activeRoom.isPrivate) {
-        (messageData.fromUserId == this.user.userId)
-        ? $("#chat-text-area ul").append("<li><span>" + message + "</span></li>")
-        : $("#chat-text-area ul").append("<li class='right-align'><span>" + message + "<span></li>");
+        if (messageData.fromUserId == this.user.userId) {
+            $("#chat-text-area ul").append(
+                `<li>
+                    <div>${fromUserName}</div>
+                    <span>${message}<span>
+                </li>`);
+        } else {
+            $("#chat-text-area ul").append(
+                `<li class='right-align'>
+                    <div class='right-align'>${fromUserName}</div>
+                    <span>${message}<span>
+                </li>`);
+        }
+        scrollToBottom();
     }
 
     // Saving to dictionary

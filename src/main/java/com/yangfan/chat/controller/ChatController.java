@@ -44,6 +44,7 @@ public class ChatController {
     @MessageMapping("/group/{roomId}")
     @SendTo("/topic/group.{roomId}")
     public GroupChatMessage sendGroupMessage(@Payload GroupChatMessage groupChatMessage) {
+        groupChatMessage.setTimestamp(Instant.now());
         messageService.add(groupChatMessage);
 
         log.info("group message '{}' sent to '{}'", groupChatMessage.getMessage(), groupChatMessage.getRoomId());
