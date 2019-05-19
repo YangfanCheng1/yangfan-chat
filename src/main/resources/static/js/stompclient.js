@@ -86,8 +86,8 @@ class User{
 }
 
 class GroupMessage {
-    constructor(userId, roomId, message, fromUserName) {
-        this.userId = userId;
+    constructor(fromUserId, roomId, message, fromUserName) {
+        this.fromUserId = fromUserId;
         this.message = message;
         this.roomId = roomId;
         this.fromUserName = fromUserName;

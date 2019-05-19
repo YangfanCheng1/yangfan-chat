@@ -4,8 +4,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.yangfan</groupId>
-	<artifactId>playground</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>chat</artifactId>
+	<version>0.0.6-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Yangfan's Chat</name>

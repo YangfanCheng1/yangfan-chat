@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Integer> {
 
-    List<Message> findByRoomOrderByIdDesc(Room room);
+    List<Message> findByRoomOrderByTimestampAsc(Room room);
 }

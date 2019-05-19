@@ -70,7 +70,7 @@ public class MessageService {
                         .message(privateMessage.getMessage()).build())
                     .collect(Collectors.toList());
         } else {
-            List<Message> messages = messageRepo.findByRoomOrderByIdDesc(new Room(activeRoom.getRoomId()));
+            List<Message> messages = messageRepo.findByRoomOrderByTimestampAsc(new Room(activeRoom.getRoomId()));
             return messages.stream()
                     .map(message -> MessageDto.builder()
                         .fromUserId(message.getUser().getUserId())
@@ -86,7 +86,7 @@ public class MessageService {
         Room room = new Room();
         room.setRoomId(groupChatMessage.getRoomId());
         User user = new User();
-        user.setUserId(groupChatMessage.getUserId());
+        user.setUserId(groupChatMessage.getFromUserId());
         Message message = Message.builder()
                 .room(room).user(user).message(groupChatMessage.getMessage()).timestamp(Instant.now())
                 .build();
