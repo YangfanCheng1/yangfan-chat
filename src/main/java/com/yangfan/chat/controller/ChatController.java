@@ -30,6 +30,7 @@ public class ChatController {
         return event;
     }
 
+    // TODO need to build a hanlder for sending to user queue
     // SendToUser is not needed as we can directly send a message to a target single user
     @MessageMapping("/private/{toUserId}")
     @SendTo("/topic/private.{toUserId}") //stomclient to subscribe to
