@@ -57,7 +57,7 @@ $(function () {
 
 function searchUsers() {
     var var0 = $("#search-user-room-input").val();
-    if (var0.length != 0) {
+    if (var0.length !== 0) {
         $('#user-search-result').show();
         $('#user-subscribed-rooms').hide();
         getUsersContaining(var0);
@@ -69,7 +69,7 @@ function searchUsers() {
 
 function changeActiveRoom(id, isPrivate, name) {
     user.rooms.forEach((room) => {
-        if (room.displayName == name) {
+        if (room.displayName === name) {
             activeRoom = room;
         }
     });
@@ -77,14 +77,14 @@ function changeActiveRoom(id, isPrivate, name) {
     let curRoom = null;
     if (isPrivate) {
         curRoom = {isPrivate: true, fromUserId: this.user.userId, toUserId: id};
-        if (privateChatMap.get(id).length == 0) {
+        if (privateChatMap.get(id).length === 0) {
             getRoomChatHistory(curRoom, isPrivate, id);
         } else {
             displayChat(id, isPrivate);
         }
     } else {
         curRoom = {isPrivate: false, roomId: id};
-        if (groupChatMap.get(id).length == 0) {
+        if (groupChatMap.get(id).length === 0) {
             getRoomChatHistory(curRoom, isPrivate, id);
         } else {
             displayChat(id, isPrivate);
@@ -113,46 +113,32 @@ function createNewPrivateRoom(id, isPrivate, name) {
 ----------------------*/
 
 function init(username) {
-    $.ajax({
-        url: "/api/user/" + username,
-        type: "GET",
-        dataType: "json",
-        cache: false,
-        context: this
-    }).done(function(userData) {
-        console.log(userData);
-        this.user = userData;
-        this.client = new StompClient();
-        this.client.connect(this.user);
-        this.activeRoom = this.user.rooms[0];
+    fetch("/api/user/" + username)
+        .then(userData => userData.json())
+        .then(userData => {
+            console.log(userData);
+            this.user = userData;
+            this.client = new StompClient();
+            this.client.connect(this.user);
+            this.activeRoom = this.user.rooms[0];
 
-        // Init privateChatMap
-        for (let room of this.user.rooms) {
-            if (room.isPrivate) {
-                privateChatMap.set(room.displayId, []);
-            } else {
-                groupChatMap.set(room.displayId, []);
+            // Init privateChatMap
+            for (let room of this.user.rooms) {
+                if (room.isPrivate) {
+                    privateChatMap.set(room.displayId, []);
+                } else {
+                    groupChatMap.set(room.displayId, []);
+                }
             }
-        }
-
-    }).fail(function(error) {
-        console.log(error);
-    });
+        })
+        .catch(error => console.error("Error in getting user data:", error));
 }
 
 function getUsersContaining(var0) {
-    $.ajax({
-        url: "/api/get-all-users-containing",
-        data: {keyword: var0},
-        type: "GET",
-        cache: false,
-        success: function(data, textStatus, xhr) {
-            displaySearchedUsers(data);
-        },
-        error: function(err) {
-            console.log(err);
-        }
-    });
+    fetch("/api/get-all-users-containing?keyword=" + var0)
+        .then(res => res.json())
+        .then(data => displaySearchedUsers(data))
+        .catch(error => console.error('Error:', error));
 }
 
 /*
@@ -166,18 +152,17 @@ function getRoomChatHistory(curRoom, isPrivate, id) {
         : `/api/chat-history/group?roomId=${curRoom.roomId}`;
 
     fetch(url)
-    .then(res => res.json())
-    .then(response => {
-        console.log('chat-history:', JSON.stringify(response));
-        if (isPrivate) {
-            privateChatMap.get(id).push(...response);
-            displayChat(id, isPrivate);
-        } else {
-            groupChatMap.get(id).push(...response);
-            displayChat(id, isPrivate);
-        }
-    })
-    .catch(error => console.error('Error:', error));
+        .then(res => res.json())
+        .then(response => {
+            if (isPrivate) {
+                privateChatMap.get(id).push(...response);
+                displayChat(id, isPrivate);
+            } else {
+                groupChatMap.get(id).push(...response);
+                displayChat(id, isPrivate);
+            }
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 /*
@@ -190,7 +175,7 @@ function addNewRoom(id, isPrivate, name) {
     var myHeaders = new Headers({
         "X-CSRF-TOKEN" : csrf_token,
         "Content-Type" : "application/json"
-    })
+    });
 
     fetch('/api/room', {
         method: "POST",

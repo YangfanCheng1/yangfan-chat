@@ -66,7 +66,6 @@ input.button {
 }
 
 /*==== navbar ====*/
-
 .bg-black {
   background-color: #242729 !important;
 }
@@ -78,6 +77,7 @@ input.button {
   font-weight: bold;
   border: none;
 }
+
 .navbar ul.nav > li > a {
   color: white;
   text-transform: uppercase;
@@ -101,12 +101,10 @@ input.button {
 .messages li {
   margin: 6px 0;
 }
-
 .messages div {
   font-size: 14px;
   font-weight: 200;
 }
-
 .messages span {
   color: white;
   font-size: 16px;

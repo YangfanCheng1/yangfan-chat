@@ -23,3 +23,6 @@
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### Tests not be committed ###
+src/test/java/com/yangfan/chat/ignore/**
