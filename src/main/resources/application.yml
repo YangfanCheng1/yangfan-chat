@@ -14,7 +14,7 @@ spring:
       ddl-auto: none
       dialect: org.hibernate.dialect.MySQL5Dialect
     open-in-view: false
-    show-sql: true
+#    show-sql: true
   datasource:
     url: ${RDS_URL}
     username: ${RDS_USERNAME}

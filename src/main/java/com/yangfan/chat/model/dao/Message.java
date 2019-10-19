@@ -16,7 +16,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "DevMessages")
+@Table
 public class Message implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,26 +39,4 @@ public class Message implements Cloneable {
     @Column(name = "timestamp")
     private Instant timestamp;
 
-    // copy constructor
-    public Message(Message message) {
-        this.message = message.getMessage();
-        this.room = new Room(message.getRoom());
-        this.user = new User(message.getUser());
-    }
-
-    // deep copy
-    @Override
-    public Message clone() throws CloneNotSupportedException {
-        Message clone = (Message) super.clone();
-
-        Room room = new Room();
-        room.setRoomId(this.room.getRoomId());
-        User user = new User();
-        user.setUserId(this.user.getUserId());
-
-        clone.setMessage(this.message);
-        clone.setRoom(room);
-        clone.setUser(user);
-        return clone;
-    }
 }

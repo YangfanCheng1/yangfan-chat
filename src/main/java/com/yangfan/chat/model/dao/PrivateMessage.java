@@ -16,7 +16,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "DevPrivateMessages")
+@Table(name = "PrivateMessages")
 public class PrivateMessage {
 
     @Id

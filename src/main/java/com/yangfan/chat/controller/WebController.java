@@ -51,7 +51,7 @@ public class WebController {
         }
 
         try {
-            UserDto user = userService.addNewUser(userRegistrationDto);
+            userService.addNewUser(userRegistrationDto);
         } catch (DuplicateUserException e) {
             model.addAttribute("userError", "Username already exists!");
             return "/sign-up";
@@ -65,6 +65,5 @@ public class WebController {
         model.addAttribute("appName", "Yangfan's Chat");
         return "log-in";
     }
-
 
 }

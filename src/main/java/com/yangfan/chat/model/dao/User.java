@@ -1,17 +1,16 @@
 package com.yangfan.chat.model.dao;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 @NoArgsConstructor
 @Entity
 @Table(
-    name = "DevUsers"
+    name = "User"
 //  JPA generates index for unique key column, below is redundant
 //    , indexes = {
 //        @Index(name ="idx", columnList = "username")
@@ -20,8 +19,7 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private int userId;
+    private int id;
 
     @Column(unique = true, nullable = false, length = 32)
     @Size(max = 32)
@@ -30,38 +28,26 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "Dev_User_Room",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "room_id") }
-    )
+    @Column
+    private String email;
+
+    // mapped by room.users
+    @ManyToMany(mappedBy = "users", targetEntity = PublicRoom.class)
     private List<Room> rooms;
-
-
-    @JsonView
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "DEV_USER_PRIVATE_ROOM",
-            joinColumns = {@JoinColumn(name = "user_1_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_2_id")}
-    )
-    private Set<User> privateRooms;
 
     // copy constructor
     User(User user) {
-        this.userId = user.getUserId();
+        this.id = user.getId();
     }
 
-    public User(int id) { this.userId = id;}
+    public User(int id) { this.id = id;}
 
-
-    public int getUserId() {
-        return userId;
+    public int getId() {
+        return id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -88,11 +74,35 @@ public class User {
         this.rooms = rooms;
     }
 
-    public Set<User> getPrivateRooms() {
-        return privateRooms;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public void setPrivateRooms(Set<User> privateRooms) {
-        this.privateRooms = privateRooms;
+    public String getEmail() {
+        return email;
+    }
+
+    /*  NO LONGER USED AS PRIVATE ROOMS
+    @JsonView
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "DEV_USER_PRIVATE_ROOM",
+            joinColumns = {@JoinColumn(name = "user_1_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_2_id")}
+    )
+    private Set<User> privateRooms;
+    */
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

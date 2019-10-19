@@ -1,8 +1,6 @@
 package com.yangfan.chat.controller;
 
-import com.yangfan.chat.model.dto.EventMessage;
-import com.yangfan.chat.model.dto.GroupChatMessage;
-import com.yangfan.chat.model.dto.PrivateChatMessage;
+import com.yangfan.chat.model.dto.*;
 import com.yangfan.chat.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +9,8 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.security.Principal;
 import java.time.Instant;
 
@@ -30,7 +30,19 @@ public class ChatController {
         return event;
     }
 
-    // TODO need to build a hanlder for sending to user queue
+    @MessageMapping("/room/{roomId}")
+    @SendTo("/topic/room.{roomId}")
+    public MessageDto sendMessage(@Payload @Valid MessagePayload messagePayload) {
+        @NotNull RoomDto roomDto = messagePayload.getRoomDto();
+        @NotNull MessageDto messageDto = messagePayload.getMessageDto();
+        log.info("Message sent (user={}, content={}, toRoom={})",
+                messageDto.getFromUserId(), messageDto.getContent(), roomDto.getId());
+        messageDto.setTimestamp(Instant.now());
+        messageService.addMessage(roomDto, messageDto);
+        return messageDto;
+    }
+
+/*    // TODO need to build a hanlder for sending to user queue
     // SendToUser is not needed as we can directly send a message to a target single user
     @MessageMapping("/private/{toUserId}")
     @SendTo("/topic/private.{toUserId}") //stomclient to subscribe to
@@ -38,7 +50,7 @@ public class ChatController {
         privateChatMessage.setTimestamp(Instant.now());
         messageService.add(privateChatMessage);
 
-        log.info("private message '{}' sent to '{}'", privateChatMessage.getMessage(), privateChatMessage.getToUserId());
+        log.info("private message '{}' sent to user '{}'", privateChatMessage.getMessage(), privateChatMessage.getToUserId());
         return privateChatMessage;
     }
 
@@ -48,8 +60,8 @@ public class ChatController {
         groupChatMessage.setTimestamp(Instant.now());
         messageService.add(groupChatMessage);
 
-        log.info("group message '{}' sent to '{}'", groupChatMessage.getMessage(), groupChatMessage.getRoomId());
+        log.info("group message '{}' sent to room '{}'", groupChatMessage.getMessage(), groupChatMessage.getRoomId());
         return groupChatMessage;
-    }
+    }*/
 
 }

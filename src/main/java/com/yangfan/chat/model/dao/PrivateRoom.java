@@ -1,50 +1,31 @@
 package com.yangfan.chat.model.dao;
 
-import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 @Entity
-@Table(name = "DevPrivateRoom")
-@Builder
-public class PrivateRoom {
+@Getter
+@Setter
+@DiscriminatorValue("private")
+@NoArgsConstructor
+public class PrivateRoom extends Room {
 
-    @Id
-    private int id;
+    public PrivateRoom(int id) {
+        super(id);
+    }
 
-    @ManyToOne
-    @JoinColumn(name = "user_id_1", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "user1_id")
     private User user1;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id_2", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "user2_id")
     private User user2;
 
-    @OneToMany
-    private List<Message> messages;
-
-    public User getUser1() {
-        return user1;
-    }
-
-    public void setUser1(User user1) {
-        this.user1 = user1;
-    }
-
-    public User getUser2() {
-        return user2;
-    }
-
-    public void setUser2(User user2) {
-        this.user2 = user2;
-    }
-
-    public List<Message> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
-    }
 }

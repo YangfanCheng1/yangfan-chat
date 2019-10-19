@@ -10,61 +10,34 @@ class StompClient {
 
     // refer to http://jmesnil.net/stomp-websocket/doc
     // client.connect(headers, connectCallback);
-    connect(user) {
-        if (this.client == null) return;
-        this.client.connect({}, function (data) {
-            console.log("Stomp client connected to the server.");
-            this.connected = true;
+    connect(user, commit) {
+        let self = this;
+        if (self.client == null) {
+            console.log("StompClient wasn't instantiated!");
+            return;
+        }
+        self.client.connect({}, data => {
+            console.log("Stomp client connected to the server: ", data);
             console.log("Subscribing to rooms...");
-            this.subscribe(user);
-        }.bind(this));
-    }
+            const rooms = user.rooms;
 
-    subscribe(user) {
-        let rooms = user.rooms;
-        let userId = user.userId;
-        var self = this;
-        if (self.client == null) return;
-        // Only subscribe to group rooms
-        rooms.forEach(function(room) {
-            if (!room.isPrivate) {
-                self.client.subscribe('/topic/group.' + room.displayId, function (chatMessage) {
-                    displayGroupChatMessage(JSON.parse(chatMessage.body));
+            rooms.forEach(room => {
+                self.client.subscribe(`/topic/room.${room.id}`, message => {
+                    console.log("Receiving message: ", message.body);
+                    commit('ADD_MESSAGE', {key: room.id, val: JSON.parse(message.body)});
                 });
-            }
-        })
-        self.client.subscribe('/topic/private.' + userId, function (roomData) {
-            if (roomData.isNew) {
-                $("#user-subscribed-rooms ul").prepend(roomData.userId, roomData.username);
-                rooms.push({displayId: roomData.fromUserId, displayName: roomData.fromUserName, isPrivate: true});
-            }
-
-            displayPrivateChatMessage(JSON.parse(roomData.body));
+            });
         });
     }
 
-    sendPrivateMessage(privateMessage) {
-        displayPrivateChatMessage(privateMessage);
+    sendMessage(room, message) {
+        const url = `/chat-app/room/${room.id}`;
+        console.log("Producing message to " + url);
         this.client.send(
-            "/chat-app/private/" + privateMessage.toUserId
-            ,{}
-            ,JSON.stringify(privateMessage)
-        );
-    }
-
-    sendGroupMessage(groupMessage) {
-        // client.send("/queue/test", {priority: 9}, "Hello, STOMP");
-        this.client.send("/chat-app/group/" + groupMessage.roomId
-            ,{}
-            ,JSON.stringify(groupMessage)
-        );
-
-    }
-
-    newEvent(fromUserId, toUserId, action) {
-        this.client.send("/chat-app/all/", {}
-            ,JSON.stringify(new Event(fromUserId, toUserId, action))
-        );
+            url,
+            {},
+            JSON.stringify(new MessagePayload(room, message))
+        )
     }
 
     disconnect() {
@@ -78,29 +51,16 @@ class StompClient {
     }
 }
 
-class User{
+class User {
     constructor(userId, userName) {
         this.userId = userId;
         this.username = userName;
     }
 }
 
-class GroupMessage {
-    constructor(fromUserId, roomId, message, fromUserName) {
-        this.fromUserId = fromUserId;
-        this.message = message;
-        this.roomId = roomId;
-        this.fromUserName = fromUserName;
-    }
-}
-
-// {fromUserId, toUserId, message}
-class PrivateMessage {
-    constructor(fromUserId, toUserId, message, fromUserName, toUserName) {
-        this.fromUserId = fromUserId;
-        this.fromUserName = fromUserName;
-        this.toUserId = toUserId;
-        this.toUserName = toUserName;
+class MessagePayload {
+    constructor(room, message) {
+        this.room = room;
         this.message = message;
     }
 }
@@ -115,8 +75,10 @@ class Room {
 
 class Event {
     constructor(fromUserId, toUserId, action) {
-        this.fromUserId = fromUserId,
-        this.toUserId = toUserId,
+        this.fromUserId = fromUserId;
+        this.toUserId = toUserId;
         this.action = action;
     }
 }
+
+export {StompClient, MessagePayload, Room, User}

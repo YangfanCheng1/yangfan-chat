@@ -4,13 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
 @Entity
-@Table(name = "DevRooms")
-public class Room {
+@Table(name = "Room")
+@Inheritance
+@DiscriminatorColumn(name = "room_type")
+public abstract class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,11 +28,6 @@ public class Room {
     @JsonIgnore
     @OneToMany(mappedBy = "room")
     private List<Message> messages;
-
-    // mapped by User.rooms
-    @JsonIgnore
-    @ManyToMany(mappedBy = "rooms")
-    private Set<User> users;
 
     // copy constructor
     public Room(Room room) {
@@ -64,11 +62,4 @@ public class Room {
         this.messages = messages;
     }
 
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
 }

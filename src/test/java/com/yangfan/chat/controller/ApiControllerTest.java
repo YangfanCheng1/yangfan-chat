@@ -47,14 +47,14 @@ class ApiControllerTest {
     @Test
     void getUserByName() throws Exception {
         UserDto userDto = UserDto.builder()
-                .userId(1)
-                .username(testUserName)
+                .id(1)
+                .name(testUserName)
                 .build();
 
         when(userService.getUserDtoByUsername(testUserName)).thenReturn(userDto);
         mockMvc.perform(get("/api/user/{user}", testUserName))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId", is(1)))
+                .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.username", is(testUserName)));
     }
 

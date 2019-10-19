@@ -1,14 +1,16 @@
 package com.yangfan.chat.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 @Builder
 public class RoomDto {
-    private int displayId;
-    private String displayName;
+    private int id;
+    private String name;
     private boolean isPrivate;
 
     // Jackson strips 'is' by default during serialization
@@ -16,6 +18,5 @@ public class RoomDto {
     public boolean isPrivate(){
         return isPrivate;
     }
-
 
 }
