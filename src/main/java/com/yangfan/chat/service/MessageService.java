@@ -1,10 +1,11 @@
 package com.yangfan.chat.service;
 
+import com.yangfan.chat.exception.NoRoomFoundException;
 import com.yangfan.chat.model.dao.*;
-import com.yangfan.chat.model.dto.*;
-import com.yangfan.chat.repository.MessageRepository;
-import com.yangfan.chat.repository.PrivateMessageRepository;
-import com.yangfan.chat.repository.PrivateRoomRepository;
+import com.yangfan.chat.model.dto.EventMessage;
+import com.yangfan.chat.model.dto.MessageDto;
+import com.yangfan.chat.model.dto.RoomDto;
+import com.yangfan.chat.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,8 +13,10 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.time.Instant;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -23,33 +26,28 @@ public class MessageService {
     private final Object mutex = new Object();
 
     private final EntityManager entityManager;
-    private final PrivateRoomRepository privateRoomRepo;
+    private final PrivateRoomRepository privateRoomRepository;
+    private final PublicRoomRepository publicRoomRepository;
     private final MessageRepository messageRepo;
-    private final PrivateMessageRepository privateMessageRepo;
     private final ApplicationEventListener ael;
     public MessageService(EntityManager entityManager,
-                          PrivateRoomRepository privateRoomRepo,
+                          PrivateRoomRepository privateRoomRepository,
+                          PublicRoomRepository publicRoomRepository,
                           MessageRepository messageRepo,
-                          PrivateMessageRepository privateMessageRepo,
                           ApplicationEventListener ael) {
         this.entityManager = entityManager;
-        this.privateRoomRepo = privateRoomRepo;
+        this.privateRoomRepository = privateRoomRepository;
+        this.publicRoomRepository = publicRoomRepository;
         this.messageRepo = messageRepo;
-        this.privateMessageRepo = privateMessageRepo;
         this.ael = ael;
     }
 
-    private static final int MESSAGE_THRESHOLD = 5;
-    private Deque<PrivateMessage> buffer = new ArrayDeque<>(MESSAGE_THRESHOLD);
+    private static final int MESSAGE_THRESHOLD = 10;
+    private Deque<Message> buffer = new ArrayDeque<>(MESSAGE_THRESHOLD);
 
     public void handleEvent(EventMessage event) {
         switch (event.getAction()) {
             case "CREATE":
-                PrivateRoom newPrivateRoom = PrivateRoom.builder()
-                        .user1(new User(event.getFromUserId()))
-                        .user2(new User(event.getToUserId()))
-                        .build();
-                privateRoomRepo.save(newPrivateRoom);
             case "DELETE":
                 //...
             default:
@@ -57,41 +55,17 @@ public class MessageService {
         }
     }
 
-    public List<MessageDto> getChatHistory(ActiveRoomDto activeRoom) {
-        if (activeRoom.isPrivate()) {
-            User user1 = new User(activeRoom.getFromUserId());
-            User user2 = new User(activeRoom.getToUserId());
-            List<PrivateMessage> pms = privateMessageRepo.findMessages(user1, user2);
-            return pms.stream()
-                    .map(privateMessage -> MessageDto.builder()
-                        .fromUserId(privateMessage.getFromUser().getUserId())
-                        .fromUserName(privateMessage.getFromUser().getUsername())
-                        .timestamp(privateMessage.getTimestamp())
-                        .message(privateMessage.getMessage()).build())
-                    .collect(Collectors.toList());
-        } else {
-            List<Message> messages = messageRepo.findByRoomOrderByTimestampAsc(new Room(activeRoom.getRoomId()));
-            return messages.stream()
-                    .map(message -> MessageDto.builder()
-                        .fromUserId(message.getUser().getUserId())
-                        .fromUserName(message.getUser().getUsername())
-                        .timestamp(message.getTimestamp())
-                        .message(message.getMessage()).build())
-                    .collect(Collectors.toList());
-        }
-    }
-
     @Transactional
-    public void add(GroupChatMessage groupChatMessage) {
-        Room room = new Room();
-        room.setRoomId(groupChatMessage.getRoomId());
-        User user = new User();
-        user.setUserId(groupChatMessage.getFromUserId());
-        Message message = Message.builder()
-                .room(room).user(user).message(groupChatMessage.getMessage()).timestamp(Instant.now())
-                .build();
-
-        entityManager.persist(message);
+    public List<MessageDto> getMessagesByRoomId(Integer roomId) {
+        PrivateRoom privateRoom = privateRoomRepository.findById(roomId).orElse(null);
+        Room room = (privateRoom != null) ? privateRoom :
+                publicRoomRepository.findById(roomId).orElseThrow(() -> new NoRoomFoundException(roomId));
+        return room.getMessages().stream().map(message -> MessageDto.builder()
+                .fromUserId(message.getUser().getId())
+                .fromUserName(message.getUser().getUsername())
+                .content(message.getMessage())
+                .timestamp(message.getTimestamp())
+                .build()).collect(Collectors.toList());
     }
 
     /**
@@ -99,35 +73,45 @@ public class MessageService {
      * case 2: user logs out, clear buffer
      * case 3: both users log in, message is saved to buffer (frequent)
      */
-    public void add(PrivateChatMessage privateChatMessage) {
-        User fromUser = new User();
-        fromUser.setUserId(privateChatMessage.getFromUserId());
-        User toUser = new User();
-        toUser.setUserId(privateChatMessage.getToUserId());
-        PrivateMessage message = PrivateMessage.builder()
-                .fromUser(fromUser)
-                .toUser(toUser)
-                .message(privateChatMessage.getMessage())
-                .timestamp(privateChatMessage.getTimestamp()).build();
+    @Transactional
+    public void addMessage(RoomDto roomDto, MessageDto messageDto) {
+        if (roomDto.isPrivate()) {
+            Message message = Message.builder()
+                    .room(new PrivateRoom(roomDto.getId()))
+                    .user(new User(messageDto.getFromUserId()))
+                    .message(messageDto.getContent())
+                    .timestamp(messageDto.getTimestamp())
+                    .build();
 
-        // If toUser isn't in session
-        if (!ael.hasUser(ael.getLoggedInUsers(), toUser.getUsername())) {
-            // If toUser disconnects from listening to queue
-            if (ael.hasUser(ael.getLoggedOutUsers(), toUser.getUsername())) {
-                synchronized (mutex) {
-                    clearBuffer();
+            // If toUser isn't in session
+            String toUser = roomDto.getName();
+            if (!ael.hasUser(ael.getLoggedInUsers(), toUser)) {
+                // If toUser disconnects from listening to queue
+                if (ael.hasUser(ael.getLoggedOutUsers(), toUser)) {
+                    synchronized (mutex) {
+                        clearBuffer();
+                    }
+                    ael.getLoggedOutUsers().remove(toUser);
                 }
-                ael.getLoggedOutUsers().remove(toUser.getUsername());
+                messageRepo.save(message);
+            } else {
+                synchronized (mutex) {
+                    buffer.offer(message);
+                }
             }
-            privateMessageRepo.save(message);
+
         } else {
-            synchronized (mutex) {
-                buffer.offer(message);
-            }
+            Message message = Message.builder()
+                    .room(new PublicRoom(roomDto.getId()))
+                    .user(new User(messageDto.getFromUserId()))
+                    .message(messageDto.getContent())
+                    .timestamp(messageDto.getTimestamp())
+                    .build();
+            entityManager.persist(message);
         }
     }
 
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/30 * * * ?")
     public void clearIfOverLimit() {
         synchronized (mutex) {
             if (buffer.size() > MESSAGE_THRESHOLD) {
@@ -137,18 +121,15 @@ public class MessageService {
     }
 
     private void clearBuffer() {
-        List<PrivateMessage> clonedMessageList = new ArrayList<>(buffer.size());
-        while (!buffer.isEmpty()) {
-            clonedMessageList.add(buffer.poll());
-        }
-        log.info("buffer cleared");
-
-        savePrivateMessages(clonedMessageList);
+        // shadow copy
+        List<Message> clonedMessageList = new ArrayList<>(buffer);
+        saveMessages(clonedMessageList);
+        buffer.clear();
     }
 
     @Async
-    private void savePrivateMessages(List<PrivateMessage> list) {
-        privateMessageRepo.saveAll(list);
+    void saveMessages(List<Message> list) {
+        messageRepo.saveAll(list);
         log.info("list of {} elems saved", list.size());
     }
 

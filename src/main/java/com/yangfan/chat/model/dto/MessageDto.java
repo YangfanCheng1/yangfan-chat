@@ -14,6 +14,6 @@ import java.time.Instant;
 public class MessageDto {
     private int fromUserId;
     private String fromUserName;
-    private String message;
+    private String content;
     private Instant timestamp;
 }

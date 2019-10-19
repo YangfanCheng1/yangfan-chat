@@ -22,4 +22,5 @@ public interface PrivateMessageRepository extends JpaRepository<PrivateMessage, 
             "WHERE (u.fromUser = ?1 AND u.toUser = ?2) OR (u.fromUser = ?2 AND u.toUser = ?1) " +
             "ORDER BY u.timestamp ASC")
     List<PrivateMessage> findMessages(User user1, User user2);
+
 }

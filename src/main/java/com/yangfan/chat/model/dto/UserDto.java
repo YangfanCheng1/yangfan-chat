@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 @Builder
 public class UserDto {
-    private int userId;
-    private String username;
+    private int id;
+    private String name;
     private List<RoomDto> rooms;
 }
