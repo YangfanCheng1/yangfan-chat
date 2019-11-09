@@ -1,6 +1,6 @@
 import {store} from "./js/store.js";
 
-var app = new Vue({
+var vm = new Vue({
     el: '#app',
     store,
     components: {

@@ -54,9 +54,9 @@ public class ApiController {
     }
 
     @GetMapping(path = "/users", produces = {"application/json"})
-    public List<UserDto> getUsersContaining(@RequestParam(value = "keyword") String searchedTerm) {
-        log.info("Searched item: {}", searchedTerm);
-        return userService.getUsersContaining(searchedTerm);
+    public List<UserDto> getUsersContaining(@RequestParam(value = "keyword") String searchedTerm, Principal principal) {
+        log.info("Searching (text={}, user={})", searchedTerm, principal.getName());
+        return userService.getUsersContaining(searchedTerm, principal.getName());
     }
 
     @GetMapping(path = "/room/{roomId}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
