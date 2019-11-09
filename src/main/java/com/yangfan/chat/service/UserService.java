@@ -82,9 +82,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public List<UserDto> getUsersContaining(String var1) {
-        List<User> users = userRepository.findByUsernameContaining(var1);
+    public List<UserDto> getUsersContaining(String text, String curUserName) {
+        List<User> users = userRepository.findOtherUsers(text, curUserName);
         return users.stream()
+                .filter(user -> !user.getUsername().equals(curUserName))
                 .map(user -> UserDto.builder()
                         .id(user.getId())
                         .name(user.getUsername())

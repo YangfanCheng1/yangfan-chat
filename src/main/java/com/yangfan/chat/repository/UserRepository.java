@@ -12,6 +12,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByUsername(String username);
 
-    List<User> findByUsernameContaining(String var1);
+    // select u from user where u.username like ?1 and u.username != name
+    List<User> findByUsernameContainingAndUsernameIsNot(String text, String name);
+
+    default List<User> findOtherUsers(String text, String name) {
+        return findByUsernameContainingAndUsernameIsNot(text, name);
+    }
 
 }

@@ -42,26 +42,4 @@ public class ChatController {
         return messageDto;
     }
 
-/*    // TODO need to build a hanlder for sending to user queue
-    // SendToUser is not needed as we can directly send a message to a target single user
-    @MessageMapping("/private/{toUserId}")
-    @SendTo("/topic/private.{toUserId}") //stomclient to subscribe to
-    public PrivateChatMessage sendPrivateMessage(@Payload PrivateChatMessage privateChatMessage) {
-        privateChatMessage.setTimestamp(Instant.now());
-        messageService.add(privateChatMessage);
-
-        log.info("private message '{}' sent to user '{}'", privateChatMessage.getMessage(), privateChatMessage.getToUserId());
-        return privateChatMessage;
-    }
-
-    @MessageMapping("/group/{roomId}")
-    @SendTo("/topic/group.{roomId}")
-    public GroupChatMessage sendGroupMessage(@Payload GroupChatMessage groupChatMessage) {
-        groupChatMessage.setTimestamp(Instant.now());
-        messageService.add(groupChatMessage);
-
-        log.info("group message '{}' sent to room '{}'", groupChatMessage.getMessage(), groupChatMessage.getRoomId());
-        return groupChatMessage;
-    }*/
-
 }

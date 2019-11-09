@@ -72,15 +72,6 @@ module.exports = {
             return this.$store.getters.messages;
         }
     },
-    // watch: {
-    //     messages: function() {
-    //         console.log("Updated dom");
-    //         // var chatArea = $("#chat-text-area");
-    //         // chatArea.animate({ scrollTop: chatArea.prop('scrollHeight')}, 1000);
-    //         let container = document.getElementById("chat-text-area");
-    //         container.scrollTop = container.scrollHeight;
-    //     }
-    // },
     mounted () {
         console.log("Mounting right panel");
     },
@@ -88,12 +79,7 @@ module.exports = {
         console.log("updated");
         let container = document.getElementById("chat-text-area");
         container.scrollTop = container.scrollHeight;
-    },
-    // created () {
-    //     setInterval(() => {
-    //         this.counter++
-    //     }, 2000)
-    // }
+    }
 }
 </script>
 
