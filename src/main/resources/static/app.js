@@ -26,7 +26,4 @@ var vm = new Vue({
     created() {
         this.$store.dispatch('init');
     }
-    // data : {}
-    // methods : {}
-    // computed: {} getters
 });

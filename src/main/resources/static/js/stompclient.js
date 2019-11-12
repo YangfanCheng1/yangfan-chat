@@ -30,6 +30,13 @@ class StompClient {
         });
     }
 
+    subscribe(room, commit) {
+        this.client.subscribe(`/topic/room.${room.id}`, message => {
+            console.log("Receiving message: ", message.body);
+            commit('ADD_MESSAGE', {key: room.id, val: JSON.parse(message.body)});
+        })
+    }
+
     sendMessage(room, message) {
         const url = `/chat-app/room/${room.id}`;
         console.log("Producing message to " + url);

@@ -30,23 +30,23 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final PrivateRoomRepository privaterr;
-    private final PublicRoomRepository publicrr;
+    private final PrivateRoomRepository privateRoomRepo;
+    private final PublicRoomRepository publicRoomRepo;
 
     public UserService(PasswordEncoder passwordEncoder,
                        UserRepository userRepository,
-                       PrivateRoomRepository privaterr, PublicRoomRepository publicrr) {
+                       PrivateRoomRepository privateRoomRepo, PublicRoomRepository publicRoomRepo) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.privaterr = privaterr;
-        this.publicrr = publicrr;
+        this.privateRoomRepo = privateRoomRepo;
+        this.publicRoomRepo = publicRoomRepo;
     }
 
-    public UserDto getUserDtoByUsername(String username) throws UserNotFoundException {
+    public UserDto getUserByName(String username) throws UserNotFoundException {
         User user = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        List<RoomDto> roomDtos = Stream.of(privaterr.findByUser(user), user.getRooms())
+        List<RoomDto> roomDtos = Stream.of(privateRoomRepo.findByUser(user), user.getRooms())
                 .flatMap(Collection::stream)
                 .map(room -> convertToRoomDto(room, user))
                 .collect(Collectors.toList());
@@ -83,14 +83,13 @@ public class UserService {
     }
 
     public List<UserDto> getUsersContaining(String text, String curUserName) {
-        List<User> users = userRepository.findOtherUsers(text, curUserName);
-        return users.stream()
-                .filter(user -> !user.getUsername().equals(curUserName))
-                .map(user -> UserDto.builder()
-                        .id(user.getId())
-                        .name(user.getUsername())
-                        .build())
-                .collect(Collectors.toList());
+        try (Stream<User> userStream = userRepository.findOtherUsers(text, curUserName)) {
+            return userStream.map(user -> UserDto.builder()
+                            .id(user.getId())
+                            .name(user.getUsername())
+                            .build())
+                    .collect(Collectors.toList());
+        }
     }
 
     public void addNewUser(UserRegistrationDto userRegistrationDto) throws DuplicateUserException {
@@ -100,14 +99,14 @@ public class UserService {
         }
 
         User newUser = new User();
-        PublicRoom allRoom = publicrr.findByRoomName("All").orElseGet(this::initAllChatRoom);
+        PublicRoom allRoom = publicRoomRepo.findByRoomName("All").orElseGet(this::initAllChatRoom);
         newUser.setUsername(username);
         newUser.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword()));
         newUser.setEmail(userRegistrationDto.getEmail());
         newUser.setRooms(Collections.singletonList(allRoom));
 
         allRoom.getUsers().add(newUser);
-        publicrr.save(allRoom);
+        publicRoomRepo.save(allRoom);
     }
 
     private PublicRoom initAllChatRoom() {

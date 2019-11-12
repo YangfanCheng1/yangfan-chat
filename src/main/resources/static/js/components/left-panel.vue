@@ -80,6 +80,7 @@ module.exports = {
                 .then(data => {
                     // i.e {id: 8, name: "user7", isPrivate: true}
                     this.$store.dispatch('addRoom', data);
+                    this.$store.dispatch('subscribe', data);
                     this.isSearchOn = false;
                 })
                 .catch(error => console.log("Couldn't add new room:", error.response.data));
@@ -91,8 +92,6 @@ module.exports = {
         },
         init: function() {
             console.log("Mounting left panel");
-            // console.log(this.$root.getUserRooms);
-            // this.rooms = this.$root.getUserRooms;
         }
     },
     computed: {

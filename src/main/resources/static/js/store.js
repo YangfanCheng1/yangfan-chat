@@ -84,8 +84,6 @@ export const store = new Vuex.Store({
                     .get(url)
                     .then(res => res.data)
                     .then(messages => {
-                        console.log("Getting room messages: ");
-                        console.log(messages);
                         commit('ADD_MESSAGES', {key: roomId, val: messages});
                     })
                     .catch(error => console.log("Couldn't load room:", error));
@@ -95,6 +93,9 @@ export const store = new Vuex.Store({
         },
         sendMessage({commit, state}, message) {
             state.client.sendMessage(state.curRoom, message)
+        },
+        subscribe({commit, state}, room) {
+            state.client.subscribe(room, commit);
         }
         // mutate state (commit is synchronous)
     },

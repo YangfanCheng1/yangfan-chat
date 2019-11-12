@@ -29,7 +29,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .maximumSessions(1).expiredUrl("/log-in").and()
                 .invalidSessionUrl("/log-in").and()
             .authorizeRequests()
-                .antMatchers("/sign-up", "/api/**", "/health").permitAll()
+                .antMatchers("/sign-up", "/health").permitAll()
                 .antMatchers("/").hasAuthority("USER")
                 .anyRequest().authenticated().and()
             .formLogin()

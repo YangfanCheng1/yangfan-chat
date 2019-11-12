@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -40,7 +39,7 @@ public class ApiController {
     // Init user state after sign in
     @GetMapping(path = "/user/{username}", produces = {"application/json"})
     public ResponseEntity<UserDto> getUser(@PathVariable String username) throws UserNotFoundException {
-        UserDto userDto = userService.getUserDtoByUsername(username);
+        UserDto userDto = userService.getUserByName(username);
         log.info("Getting {}", userDto);
         return ResponseEntity.ok(userDto);
     }
@@ -48,7 +47,7 @@ public class ApiController {
     @GetMapping(path = "/user", produces = {"application/json"})
     public ResponseEntity<UserDto> initUser(Principal principal) throws UserNotFoundException {
         String username = principal.getName();
-        UserDto userDto = userService.getUserDtoByUsername(username);
+        UserDto userDto = userService.getUserByName(username);
         log.info("Getting {}", userDto);
         return ResponseEntity.ok(userDto);
     }
@@ -92,18 +91,5 @@ public class ApiController {
     public List<User> getAll() {
         return userService.getAllUsers();
     }
-
-    /* --
-    @Deprecated
-    @PostMapping(path = "/sign-in", consumes = {"application/json"}, produces = {"application/json"})
-    public String getUser(@RequestBody User user) throws UserNotFoundException {
-        log.info("I am at sign in");
-        String username = user.getUsername();
-        User savedUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(username));
-        log.info("{} logged in", username);
-        return "{\"status\": \"Welcome, " + username + "\"}";
-    }
-    -- */
 
 }

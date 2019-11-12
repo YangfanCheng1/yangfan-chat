@@ -5,7 +5,9 @@ import com.yangfan.chat.model.dao.*;
 import com.yangfan.chat.model.dto.EventMessage;
 import com.yangfan.chat.model.dto.MessageDto;
 import com.yangfan.chat.model.dto.RoomDto;
-import com.yangfan.chat.repository.*;
+import com.yangfan.chat.repository.MessageRepository;
+import com.yangfan.chat.repository.PrivateRoomRepository;
+import com.yangfan.chat.repository.PublicRoomRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,10 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -60,12 +59,14 @@ public class MessageService {
         PrivateRoom privateRoom = privateRoomRepository.findById(roomId).orElse(null);
         Room room = (privateRoom != null) ? privateRoom :
                 publicRoomRepository.findById(roomId).orElseThrow(() -> new NoRoomFoundException(roomId));
-        return room.getMessages().stream().map(message -> MessageDto.builder()
-                .fromUserId(message.getUser().getId())
-                .fromUserName(message.getUser().getUsername())
-                .content(message.getMessage())
-                .timestamp(message.getTimestamp())
-                .build()).collect(Collectors.toList());
+        return room.getMessages().stream()
+                .map(message -> MessageDto.builder()
+                        .fromUserId(message.getUser().getId())
+                        .fromUserName(message.getUser().getUsername())
+                        .content(message.getMessage())
+                        .timestamp(message.getTimestamp()).build())
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     /**

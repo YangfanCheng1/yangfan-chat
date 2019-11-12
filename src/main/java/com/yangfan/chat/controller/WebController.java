@@ -28,7 +28,7 @@ public class WebController {
     @GetMapping(value = {"/index", "/index.html", "/", ""})
     public String index(Model model, Principal principal) throws UserNotFoundException {
         String userName = principal.getName();
-        UserDto userDto = userService.getUserDtoByUsername(userName);
+        UserDto userDto = userService.getUserByName(userName);
         model.addAttribute("appName", "Yangfan's Chat");
         model.addAttribute("userName", userName);
         model.addAttribute("user", userDto);
