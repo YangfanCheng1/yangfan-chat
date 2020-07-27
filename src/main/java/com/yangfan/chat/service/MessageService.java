@@ -6,6 +6,7 @@ import com.yangfan.chat.model.dto.EventMessage;
 import com.yangfan.chat.model.dto.MessageDto;
 import com.yangfan.chat.model.dto.RoomDto;
 import com.yangfan.chat.repository.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MessageService {
 
     private final Object mutex = new Object();
@@ -29,18 +31,7 @@ public class MessageService {
     private final PrivateRoomRepository privateRoomRepository;
     private final PublicRoomRepository publicRoomRepository;
     private final MessageRepository messageRepo;
-    private final ApplicationEventListener ael;
-    public MessageService(EntityManager entityManager,
-                          PrivateRoomRepository privateRoomRepository,
-                          PublicRoomRepository publicRoomRepository,
-                          MessageRepository messageRepo,
-                          ApplicationEventListener ael) {
-        this.entityManager = entityManager;
-        this.privateRoomRepository = privateRoomRepository;
-        this.publicRoomRepository = publicRoomRepository;
-        this.messageRepo = messageRepo;
-        this.ael = ael;
-    }
+    private final ApplicationEventListener listener;
 
     private static final int MESSAGE_THRESHOLD = 10;
     private Deque<Message> buffer = new ArrayDeque<>(MESSAGE_THRESHOLD);
@@ -83,23 +74,7 @@ public class MessageService {
                     .timestamp(messageDto.getTimestamp())
                     .build();
 
-            // If toUser isn't in session
-            String toUser = roomDto.getName();
-            if (!ael.hasUser(ael.getLoggedInUsers(), toUser)) {
-                // If toUser disconnects from listening to queue
-                if (ael.hasUser(ael.getLoggedOutUsers(), toUser)) {
-                    synchronized (mutex) {
-                        clearBuffer();
-                    }
-                    ael.getLoggedOutUsers().remove(toUser);
-                }
-                messageRepo.save(message);
-            } else {
-                synchronized (mutex) {
-                    buffer.offer(message);
-                }
-            }
-
+            entityManager.persist(message);
         } else {
             Message message = Message.builder()
                     .room(new PublicRoom(roomDto.getId()))

@@ -16,14 +16,15 @@ spring:
     open-in-view: false
 #    show-sql: true
   datasource:
-    url: ${RDS_URL}
-    username: ${RDS_USERNAME}
-    password: ${RDS_PASSWORD}
+    url: jdbc:mysql://localhost/yc-chat
+    username: root
+    password: root
   thymeleaf:
     cache: false
   redis:
-    host: ${REDIS_URL}
+    host: localhost
     port: 6379
+
   session:
     store-type: redis
 

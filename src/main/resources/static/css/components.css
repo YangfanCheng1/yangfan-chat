@@ -3,7 +3,6 @@ black {
     color: black;
 }
 
-
 input.button {
   width: auto;
   color: white;
@@ -94,24 +93,6 @@ input.button {
   .navbar ul.nav > li > a:hover {
     border:unset;
   }
-}
-
-/*==== messages ====*/
-
-.messages li {
-  margin: 6px 0;
-}
-.messages div {
-  font-size: 14px;
-  font-weight: 200;
-}
-.messages span {
-  color: white;
-  font-size: 16px;
-  margin: 2px 0;
-  border-radius: 25px;
-  background: orange;
-  padding: 5px 12px;
 }
 
 /*-------------------------

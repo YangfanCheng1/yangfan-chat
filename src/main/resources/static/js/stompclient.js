@@ -27,7 +27,22 @@ class StompClient {
                     commit('ADD_MESSAGE', {key: room.id, val: JSON.parse(message.body)});
                 });
             });
+
+            self.client.subscribe(`/user/queue/notify`, event => {
+                // room - {id: 25, name: user1, isPrivate: true}
+                let room = JSON.parse(event.body);
+                commit('ADD_ROOM', room);
+                this.subscribe(room, commit);
+            })
         });
+    }
+
+    subscribe(room, commit) {
+        console.log("Subscribing to room ", room);
+        this.client.subscribe(`/topic/room.${room.id}`, message => {
+            console.log("Receiving message: ", message.body);
+            commit('ADD_MESSAGE', {key: room.id, val: JSON.parse(message.body)});
+        })
     }
 
     sendMessage(room, message) {
@@ -37,6 +52,23 @@ class StompClient {
             url,
             {},
             JSON.stringify(new MessagePayload(room, message))
+        )
+    }
+
+    sendEvent(fromUser, event) {
+        const url = `/chat-app/user`;
+        const ev =
+            {
+                fromUser: {
+                    id: fromUser.id,
+                    name: fromUser.name
+                },
+                room: event.room
+            };
+        this.client.send(
+            url,
+            {username: event.user.name},
+            JSON.stringify(ev)
         )
     }
 

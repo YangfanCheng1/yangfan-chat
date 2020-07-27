@@ -1,19 +1,15 @@
 package com.yangfan.chat.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
 
-@Data
+@Value
+@With
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class MessageDto {
-    private int fromUserId;
-    private String fromUserName;
-    private String content;
-    private Instant timestamp;
+    int fromUserId;
+    String fromUserName;
+    String content;
+    Instant timestamp;
 }
