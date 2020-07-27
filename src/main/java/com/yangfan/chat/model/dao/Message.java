@@ -12,9 +12,9 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table
 public class Message implements Cloneable {

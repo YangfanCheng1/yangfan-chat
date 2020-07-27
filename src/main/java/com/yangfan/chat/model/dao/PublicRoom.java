@@ -1,5 +1,9 @@
 package com.yangfan.chat.model.dao;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,11 +12,12 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Getter
-@Setter
-@DiscriminatorValue("public")
+@EqualsAndHashCode(callSuper = true)
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@DiscriminatorValue("public")
 public class PublicRoom extends Room {
 
     public PublicRoom(int id) {

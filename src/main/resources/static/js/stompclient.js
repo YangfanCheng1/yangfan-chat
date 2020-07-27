@@ -105,12 +105,4 @@ class Room {
     }
 }
 
-class Event {
-    constructor(fromUserId, toUserId, action) {
-        this.fromUserId = fromUserId;
-        this.toUserId = toUserId;
-        this.action = action;
-    }
-}
-
 export {StompClient, MessagePayload, Room, User}

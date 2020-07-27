@@ -1,5 +1,4 @@
 import * as models from "./stompclient.js";
-import {MessagePayload} from "./stompclient.js";
 
 export const store = new Vuex.Store({
     state: {

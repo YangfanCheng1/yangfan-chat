@@ -1,19 +1,22 @@
 package com.yangfan.chat.model.dao;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
-@Entity
-@Getter
-@Setter
-@DiscriminatorValue("private")
+@EqualsAndHashCode(callSuper = true)
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@DiscriminatorValue("private")
 public class PrivateRoom extends Room {
 
     public PrivateRoom(int id) {
