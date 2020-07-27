@@ -5,9 +5,9 @@
         </div>
         <div id="chat-text-area" class="max-height-50vh">
             <ul class="messages">
-                <li v-bind:class="align(message.fromUserId)" v-for="message in messages">
+                <li v-for="message in messages">
                     <div>{{ message.fromUserName }}</div>
-                    <span>{{ message.content }}</span>
+                    <span v-bind:class="align(message.fromUserId)">{{ message.content }}</span>
                 </li>
             </ul>
         </div>
@@ -47,7 +47,7 @@ module.exports = {
             this.$store.dispatch('sendMessage', message);
         },
         align: function(id) {
-            return id !== this.user.id ? 'right-align' : ''
+            return (id !== this.user.id ? 'orange' : 'blue') + "-background"
         },
         scroll: function(element, to, duration) {
             if (duration <= 0) return;
@@ -84,4 +84,26 @@ module.exports = {
 </script>
 
 <style scoped>
+.messages li {
+    margin: 6px 0;
+}
+.messages div {
+    font-size: 14px;
+    font-weight: 200;
+}
+.messages span {
+    color: white;
+    font-size: 16px;
+    margin: 2px 0;
+    border-radius: 25px;
+    padding: 5px 12px;
+}
+
+.blue-background {
+    background: #8eb2ff;
+}
+
+.orange-background {
+    background: #ffbb30;
+}
 </style>

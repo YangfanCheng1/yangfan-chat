@@ -1,8 +1,10 @@
 <template>
     <div class="margin-bottom-sm">
-        <form id="search-user-room-form" method="post" v-on:submit.prevent="onSubmit">
-            <input v-on:keyup="search" v-model="query" name="search-user" class="form-control" placeholder="Search an user">
-        </form>
+        <div class="height-50">
+            <form id="search-user-room-form" method="post" v-on:submit.prevent="onSubmit">
+                <input v-on:keyup="search" v-model="query" name="search-user" class="form-control" placeholder="Search an user">
+            </form>
+        </div>
         <div v-if="isSearchOn" id="user-search-result">
             <ul class="rooms">
                 <li @click="addRoom(user.id, user.name)"
@@ -10,21 +12,17 @@
                     v-bind:key="user.id"
                     v-bind:data-id="user.id"
                     v-bind:data-private="true"
-                    v-bind:data-name="user.name">
-                    {{user.name}}
-                </li>
+                    v-bind:data-name="user.name">{{user.name}}</li>
             </ul>
         </div>
-        <div v-if="!isSearchOn" id="user-subscribed-rooms">
+        <div v-else id="user-subscribed-rooms">
             <ul class="rooms">
                 <li @click="setCurRoom(room)"
                     v-for="room in rooms"
                     v-bind:key="room.id + room.name"
                     v-bind:data-id="room.id"
                     v-bind:data-private="room.isPrivate"
-                    v-bind:data-name="room.name">
-                    {{room.name}}
-                </li>
+                    v-bind:data-name="room.name">{{room.name}}</li>
             </ul>
         </div>
     </div>
@@ -77,9 +75,11 @@ module.exports = {
             axios
                 .post("/api/room", data, headers)
                 .then(res => res.data)
-                .then(data => {
+                .then(room => {
                     // i.e {id: 8, name: "user7", isPrivate: true}
-                    this.$store.dispatch('addRoom', data);
+                    this.$store.dispatch('addRoom', room);
+                    // data - {user: {id: 123, name: foo}, room: {id: 25, name: user1, isPrivate: true}}
+                    this.$store.dispatch('sendEvent', {user: data.toUser, room: room}); // Notify the other user
                     this.isSearchOn = false;
                 })
                 .catch(error => console.log("Couldn't add new room:", error.response.data));
@@ -107,5 +107,7 @@ module.exports = {
 </script>
 
 <style scoped>
-
+.height-50 {
+    height: 50px;
+}
 </style>

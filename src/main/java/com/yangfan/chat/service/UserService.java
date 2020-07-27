@@ -12,6 +12,7 @@ import com.yangfan.chat.model.dto.UserRegistrationDto;
 import com.yangfan.chat.repository.PrivateRoomRepository;
 import com.yangfan.chat.repository.PublicRoomRepository;
 import com.yangfan.chat.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,21 +27,13 @@ import java.util.stream.Stream;
 @Slf4j
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final PrivateRoomRepository privaterr;
     private final PublicRoomRepository publicrr;
-
-    public UserService(PasswordEncoder passwordEncoder,
-                       UserRepository userRepository,
-                       PrivateRoomRepository privaterr, PublicRoomRepository publicrr) {
-        this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
-        this.privaterr = privaterr;
-        this.publicrr = publicrr;
-    }
 
     public UserDto getUserDtoByUsername(String username) throws UserNotFoundException {
         User user = userRepository

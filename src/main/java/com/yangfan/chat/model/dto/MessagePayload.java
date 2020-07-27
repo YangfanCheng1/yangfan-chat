@@ -1,14 +1,19 @@
 package com.yangfan.chat.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Value;
+import lombok.With;
 
 import javax.validation.constraints.NotNull;
 
-@Data
+@Value
+@With
 public class MessagePayload {
-    @NotNull @JsonProperty("room")
+    @NotNull
+    @JsonProperty("room")
     RoomDto roomDto;
-    @NotNull @JsonProperty("message")
+
+    @NotNull
+    @JsonProperty("message")
     MessageDto messageDto;
 }

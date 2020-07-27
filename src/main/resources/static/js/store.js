@@ -46,12 +46,15 @@ export const store = new Vuex.Store({
             const key = entry.key;
             const val = entry.val;
             console.log("Add message : ", entry);
+            if (!state.messageMap.has(key)) {
+                state.messageMap.set(key, []);
+            }
             state.messageMap.get(key).push(val);
             // if user is in curRoom
             if (state.curRoom.id === key) {
                 state.curMessages.messages = state.messageMap.get(key);
             }
-        }
+        },
         // commit + track state changes actions -> mutations
     },
     actions: {
@@ -73,8 +76,12 @@ export const store = new Vuex.Store({
             commit('SET_CUR_ROOM', room);
             commit('SET_CUR_MESSAGES', state.messageMap.get(room.id));
         },
-        addRoom(context, room) {
-            context.commit('ADD_ROOM', room);
+        addRoom({commit, state}, room) {
+            // room - {id: 25, name: user1, isPrivate: true}
+            console.log("Adding room, ", room);
+            commit('ADD_ROOM', room);
+            // after room gets added. need to subscribe
+            state.client.subscribe(room, commit);
         },
         getMessages({commit, state}, room) {
             const roomId = room.id;
@@ -95,6 +102,9 @@ export const store = new Vuex.Store({
         },
         sendMessage({commit, state}, message) {
             state.client.sendMessage(state.curRoom, message)
+        },
+        sendEvent({commit, state}, event) {
+            state.client.sendEvent(state.user, event);
         }
         // mutate state (commit is synchronous)
     },

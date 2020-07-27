@@ -32,13 +32,14 @@ public class RoomService {
 
     public Room addRoom(PrivateRoomRegistration privateRoomRegistration) throws UserNotFoundException, DuplicatePrivateRoomException {
         // Validation before room creation
-        User fromUser = userRepo.findById(privateRoomRegistration.getFromUser().getId()).orElseThrow(UserNotFoundException::new);
-        User toUser = userRepo.findById(privateRoomRegistration.getToUser().getId()).orElseThrow(UserNotFoundException::new);
-        Set<User> users = Stream.of(fromUser, toUser).collect(Collectors.toSet());
+        User fromUser = userRepo.findById(privateRoomRegistration.getFromUser().getId())
+                .orElseThrow(UserNotFoundException::new);
+        User toUser = userRepo.findById(privateRoomRegistration.getToUser().getId())
+                .orElseThrow(UserNotFoundException::new);
 
         if (privateRoomRepository.findByTwoUsers(fromUser, toUser) != null) {
             throw new DuplicatePrivateRoomException(
-                    String.format("Private room exists for %s and %s!", fromUser.getUsername(), toUser.getUsername())
+                    String.format("Private room already exists for %s and %s!", fromUser.getUsername(), toUser.getUsername())
             );
         }
 

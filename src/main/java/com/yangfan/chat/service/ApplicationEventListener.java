@@ -28,7 +28,9 @@ public class ApplicationEventListener {
     public void listenOnConnect(SessionConnectedEvent ev) {
         log.info("user connected: {}", ev.getMessage());
         if (ev.getUser() != null) {
-            loggedInUsers.putIfAbsent(ev.getUser().getName(), Boolean.TRUE);
+            String username = ev.getUser().getName();
+            loggedOutUsers.remove(username);
+            loggedInUsers.putIfAbsent(username, Boolean.TRUE);
         }
     }
 
