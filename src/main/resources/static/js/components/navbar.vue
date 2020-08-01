@@ -31,6 +31,9 @@
 
 <script>
 module.exports = {
+    components: {
+
+    },
     data () {
         return {
             token: ''

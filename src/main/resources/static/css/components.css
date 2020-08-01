@@ -57,13 +57,6 @@ input.button {
   margin-bottom: 10px;
 }
 
-/*==== rooms ====*/
-
-.rooms li:hover {
-  background: #cccccc;
-  cursor: pointer;
-}
-
 /*==== navbar ====*/
 .bg-black {
   background-color: #242729 !important;

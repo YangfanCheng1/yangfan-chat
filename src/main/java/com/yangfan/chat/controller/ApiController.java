@@ -11,14 +11,19 @@ import com.yangfan.chat.model.dto.request.PrivateRoomRegistration;
 import com.yangfan.chat.service.MessageService;
 import com.yangfan.chat.service.RoomService;
 import com.yangfan.chat.service.UserService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -37,15 +42,15 @@ public class ApiController {
     // Init user state after sign in
     @GetMapping("/user/{username}")
     public ResponseEntity<UserDto> getUser(@PathVariable String username) throws UserNotFoundException {
-        UserDto userDto = userService.getUserDtoByUsername(username);
+        val userDto = userService.getUserDtoByUsername(username);
         log.info("Getting {}", userDto);
         return ResponseEntity.ok(userDto);
     }
 
     @GetMapping("/user")
     public ResponseEntity<UserDto> initUser(Principal principal) throws UserNotFoundException {
-        String username = principal.getName();
-        UserDto userDto = userService.getUserDtoByUsername(username);
+        val username = principal.getName();
+        val userDto = userService.getUserDtoByUsername(username);
         log.info("Getting {}", userDto);
         return ResponseEntity.ok(userDto);
     }

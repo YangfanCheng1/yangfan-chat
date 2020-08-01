@@ -6,24 +6,27 @@
             </form>
         </div>
         <div v-if="isSearchOn" id="user-search-result">
-            <ul class="rooms">
-                <li @click="addRoom(user.id, user.name)"
+            <div class="rooms">
+                <div @click="addRoom(user.id, user.name)"
                     v-for="user in searchResult"
                     v-bind:key="user.id"
                     v-bind:data-id="user.id"
                     v-bind:data-private="true"
-                    v-bind:data-name="user.name">{{user.name}}</li>
-            </ul>
+                    v-bind:data-name="user.name">{{user.name}}</div>
+            </div>
         </div>
         <div v-else id="user-subscribed-rooms">
-            <ul class="rooms">
-                <li @click="setCurRoom(room)"
+            <div class="rooms">
+                <div @click="setCurRoom(room)"
                     v-for="room in rooms"
                     v-bind:key="room.id + room.name"
                     v-bind:data-id="room.id"
                     v-bind:data-private="room.isPrivate"
-                    v-bind:data-name="room.name">{{room.name}}</li>
-            </ul>
+                    v-bind:data-name="room.name">
+                    <div v-bind:class="['status', getClassOnStatus(room)]"></div>
+                    {{room.name}}
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -77,7 +80,6 @@ module.exports = {
                 .then(res => res.data)
                 .then(room => {
                     // i.e {id: 8, name: "user7", isPrivate: true}
-                    this.$store.dispatch('addRoom', room);
                     // data - {user: {id: 123, name: foo}, room: {id: 25, name: user1, isPrivate: true}}
                     this.$store.dispatch('sendEvent', {user: data.toUser, room: room}); // Notify the other user
                     this.isSearchOn = false;
@@ -89,10 +91,18 @@ module.exports = {
             this.$store.dispatch('setCurRoom', room);
             this.$store.dispatch('getMessages', room);
         },
+        getClassOnStatus: function (room) {
+            switch (room.status) {
+                case 'ONLINE':
+                    return 'online';
+                case 'OFFLINE':
+                    return 'offline';
+                default:
+                    return '';
+            }
+        },
         init: function() {
             console.log("Mounting left panel");
-            // console.log(this.$root.getUserRooms);
-            // this.rooms = this.$root.getUserRooms;
         }
     },
     computed: {
@@ -107,6 +117,30 @@ module.exports = {
 </script>
 
 <style scoped>
+.rooms div:hover {
+    background: #f8e7e7;
+    cursor: pointer;
+}
+.status {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+}
+.online {
+    background: #86d597;
+    border: 1px solid #9c9c9c;
+    border-radius: 2px;
+}
+.offline {
+    border: 1px solid #9c9c9c;
+    border-radius: 2px;
+}
+.none {
+
+}
+.background-none {
+    background: none;
+}
 .height-50 {
     height: 50px;
 }

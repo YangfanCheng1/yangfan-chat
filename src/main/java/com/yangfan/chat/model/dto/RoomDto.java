@@ -13,11 +13,15 @@ public class RoomDto {
     String name;
     @Builder.Default
     boolean isPrivate = true;
+    @Builder.Default
+    Status status = Status.OFFLINE;
 
     // Jackson strips 'is' by default during serialization
     @JsonGetter(value = "isPrivate")
     public boolean isPrivate(){
         return isPrivate;
     }
+
+    public enum Status {ONLINE, OFFLINE, NONE}
 
 }

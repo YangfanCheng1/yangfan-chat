@@ -14,6 +14,7 @@ import com.yangfan.chat.repository.PublicRoomRepository;
 import com.yangfan.chat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.yangfan.chat.model.dto.RoomDto.Status.NONE;
+import static com.yangfan.chat.model.dto.RoomDto.Status.OFFLINE;
+import static com.yangfan.chat.model.dto.RoomDto.Status.ONLINE;
+
 @Slf4j
 @Service
 @Transactional
@@ -32,14 +37,15 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final PrivateRoomRepository privaterr;
-    private final PublicRoomRepository publicrr;
+    private final PrivateRoomRepository privateRoomRepository;
+    private final PublicRoomRepository publicRoomRepository;
+    private final ApplicationEventListener eventListener;
 
     public UserDto getUserDtoByUsername(String username) throws UserNotFoundException {
         User user = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        List<RoomDto> roomDtos = Stream.of(privaterr.findByUser(user), user.getRooms())
+        List<RoomDto> roomDtos = Stream.of(privateRoomRepository.findByUser(user), user.getRooms())
                 .flatMap(Collection::stream)
                 .map(room -> convertToRoomDto(room, user))
                 .collect(Collectors.toList());
@@ -61,13 +67,13 @@ public class UserService {
                     .id(room.getRoomId())
                     .name(roomName)
                     .isPrivate(true)
-                    .build();
+                    .status(eventListener.getStatus(roomName)).build();
         } else {
             return RoomDto.builder()
                     .id(room.getRoomId())
                     .name(room.getRoomName())
                     .isPrivate(false)
-                    .build();
+                    .status(NONE).build();
         }
     }
 
@@ -93,14 +99,14 @@ public class UserService {
         }
 
         User newUser = new User();
-        PublicRoom allRoom = publicrr.findByRoomName("All").orElseGet(this::initAllChatRoom);
+        PublicRoom allRoom = publicRoomRepository.findByRoomName("All").orElseGet(this::initAllChatRoom);
         newUser.setUsername(username);
         newUser.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword()));
         newUser.setEmail(userRegistrationDto.getEmail());
         newUser.setRooms(Collections.singletonList(allRoom));
 
         allRoom.getUsers().add(newUser);
-        publicrr.save(allRoom);
+        publicRoomRepository.save(allRoom);
     }
 
     private PublicRoom initAllChatRoom() {
