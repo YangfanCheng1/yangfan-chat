@@ -17,9 +17,7 @@ export const store = new Vuex.Store({
         },
         messageMap: new Map(), // roomId : messages
         client: new models.StompClient(),
-        test: {
-            books: []
-        }
+        load: false
     },
     mutations: {
         SET_USER(state, user) {
@@ -91,6 +89,7 @@ export const store = new Vuex.Store({
             const roomId = room.id;
             if (!state.messageMap.has(roomId)) {
                 const url = `/api/room/${roomId}/messages`;
+                state.load = !state.load;
                 axios
                     .get(url)
                     .then(res => res.data)

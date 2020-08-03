@@ -1,9 +1,9 @@
 <template>
     <div class="margin-bottom-sm">
         <div class="height-50">
-            <form id="search-user-room-form" method="post" v-on:submit.prevent="onSubmit">
-                <input v-on:keyup="search" v-model="query" name="search-user" class="form-control" placeholder="Search an user">
-            </form>
+            <b-form method="post" v-on:submit.prevent="onSubmit" autocomplete="off">
+                <b-input v-on:keyup="search" v-model="query" name="search-user" placeholder="Search an user"></b-input>
+            </b-form>
         </div>
         <div v-if="isSearchOn" id="user-search-result">
             <div class="rooms">

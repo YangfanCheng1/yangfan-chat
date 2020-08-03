@@ -1,13 +1,14 @@
 import {store} from "./js/store.js";
 
+Vue.component('navbar', httpVueLoader("js/components/navbar.vue"));
+Vue.component('left-panel', httpVueLoader("js/components/left-panel.vue"));
+Vue.component('right-panel', httpVueLoader("js/components/right-panel.vue"));
+
 var vm = new Vue({
     el: '#app',
     store,
     components: {
-        'navbar': httpVueLoader("js/components/navbar.vue"),
-        'left-panel': httpVueLoader("js/components/left-panel.vue"),
-        'right-panel': httpVueLoader("js/components/right-panel.vue"),
-        "test": httpVueLoader("js/components/test.vue")
+        'app': httpVueLoader("js/app.vue"),
     },
     computed: {
         getUserId() {
