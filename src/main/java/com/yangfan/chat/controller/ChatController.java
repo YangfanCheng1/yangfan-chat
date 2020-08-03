@@ -5,7 +5,9 @@ import com.yangfan.chat.model.dto.EventMessage;
 import com.yangfan.chat.model.dto.MessageDto;
 import com.yangfan.chat.model.dto.MessagePayload;
 import com.yangfan.chat.model.dto.RoomDto;
+import com.yangfan.chat.service.ApplicationEventListener;
 import com.yangfan.chat.service.MessageService;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -23,13 +25,12 @@ import java.time.Instant;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class ChatController {
 
-    @Autowired
-    MessageService messageService;
-
-    @Autowired
-    SimpMessagingTemplate simpMessagingTemplate;
+    private final MessageService messageService;
+    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final ApplicationEventListener eventListener;
 
     // takes message sent from front end to the backend messaging queue /chat-app/all
     @MessageMapping("/all") //application destination
@@ -43,8 +44,8 @@ public class ChatController {
     @MessageMapping("/room/{roomId}")
     @SendTo("/topic/room.{roomId}")
     public MessageDto sendMessage(@Payload @Valid MessagePayload messagePayload) {
-        RoomDto roomDto = messagePayload.getRoomDto();
-        MessageDto messageDto = messagePayload.getMessageDto().withTimestamp(Instant.now());
+        val roomDto = messagePayload.getRoomDto();
+        val messageDto = messagePayload.getMessageDto().withTimestamp(Instant.now());
         log.info("Message sent (user={}, content={}, toRoom={})",
                 messageDto.getFromUserId(), messageDto.getContent(), roomDto.getId());
         messageService.addMessage(roomDto, messageDto);
@@ -52,12 +53,20 @@ public class ChatController {
     }
 
     @MessageMapping("/user")
-    public void handleEvent(@Payload @Valid EventDto eventDto, Principal principal, @Header String username) {
-        log.info("New event from User(id={}, name={})", eventDto.fromUser.id, eventDto.fromUser.name);
-        val room = RoomDto.builder()
+    public void handleEvent(@Payload @Valid EventDto eventDto, Principal principal, @Header("username") String toUserName) {
+        val fromUserName = eventDto.fromUser.name;
+        log.info("New event from User(id={}, name={})", eventDto.fromUser.id, fromUserName);
+        val toUserRoom = RoomDto.builder()
                 .id(eventDto.room.getId())
-                .name(eventDto.fromUser.name).build();
-        simpMessagingTemplate.convertAndSendToUser(username, "/queue/notify", room);
+                .name(fromUserName)
+                .status(eventListener.getStatus(fromUserName)).build();
+        simpMessagingTemplate.convertAndSendToUser(toUserName, "/queue/notify", toUserRoom);
+
+        val fromUserRoom = RoomDto.builder()
+                .id(eventDto.room.getId())
+                .name(toUserName)
+                .status(eventListener.getStatus(toUserName)).build();
+        simpMessagingTemplate.convertAndSendToUser(fromUserName, "/queue/notify", fromUserRoom);
     }
 
     @Value

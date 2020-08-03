@@ -32,11 +32,18 @@ export const store = new Vuex.Store({
         SET_CUR_MESSAGES(state, id) {
             state.curMessages.messages = state.messageMap.get(id);
         },
+        SET_ROOM_STATUS: (state, entry) => { // entry: {id: -1, name: another_user, status: ONLINE}
+            state.user.rooms.forEach(room => {
+                if (room.name === entry.name) {
+                    room.status = entry.status;
+                }
+            })
+        },
         ADD_ROOM(state, room) {
             state.user.rooms.push(room);
         },
         ADD_MESSAGES(state, entry) {
-            // id -> messages
+            // roomId: messages
             const key = entry.key;
             const val = entry.val;
             state.curMessages.messages = (state.messageMap.set(key, val)).get(key);
@@ -79,8 +86,6 @@ export const store = new Vuex.Store({
             // room - {id: 25, name: user1, isPrivate: true}
             console.log("Adding room, ", room);
             commit('ADD_ROOM', room);
-            // after room gets added. need to subscribe
-            state.client.subscribe(room, commit);
         },
         getMessages({commit, state}, room) {
             const roomId = room.id;

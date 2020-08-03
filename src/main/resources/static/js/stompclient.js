@@ -8,8 +8,6 @@ class StompClient {
         this.connected = false;
     }
 
-    // refer to http://jmesnil.net/stomp-websocket/doc
-    // client.connect(headers, connectCallback);
     connect(user, commit) {
         let self = this;
         if (self.client == null) {
@@ -28,9 +26,14 @@ class StompClient {
                 });
             });
 
+            self.client.subscribe(`/topic/all`, event => {
+               const room = JSON.parse(event.body);
+               commit("SET_ROOM_STATUS", room);
+            });
+
             self.client.subscribe(`/user/queue/notify`, event => {
                 // room - {id: 25, name: user1, isPrivate: true}
-                let room = JSON.parse(event.body);
+                const room = JSON.parse(event.body);
                 commit('ADD_ROOM', room);
                 this.subscribe(room, commit);
             })
