@@ -26,7 +26,7 @@
                      :class="[{selected: idx === activeIdx}, {'weight-900': hasPush(room.status)}]">
                     <div v-bind:class="['status', getStatus(room)]"></div>
                     {{room.name}}
-                    <b-badge v-if="hasPush(room.status)" variant="light">1</b-badge>
+                    <b-badge v-if="hasPush(room.status)" variant="dark" pill>1</b-badge>
                 </div>
             </div>
         </div>
