@@ -5,7 +5,7 @@ export const store = new Vuex.Store({
         user: {
             id: -1,
             name: '',
-            rooms: [],
+            rooms: [], // {id: 1, name: user2, isPrivate: true, status: online}
         },
         curRoom: {
             id: -1,
@@ -17,7 +17,8 @@ export const store = new Vuex.Store({
         },
         messageMap: new Map(), // roomId : messages
         client: new models.StompClient(),
-        load: false
+        load: false,
+        count: 0
     },
     mutations: {
         SET_USER(state, user) {
@@ -31,6 +32,9 @@ export const store = new Vuex.Store({
             state.curMessages.messages = state.messageMap.get(id);
         },
         SET_ROOM_STATUS: (state, entry) => { // entry: {id: -1, name: another_user, status: ONLINE}
+            if (entry.status === "ONLINE") state.count++;
+            else state.count--;
+
             state.user.rooms.forEach(room => {
                 if (room.name === entry.name) {
                     room.status = entry.status;
@@ -49,7 +53,6 @@ export const store = new Vuex.Store({
         ADD_MESSAGE(state, entry) {
             const key = entry.key;
             const val = entry.val;
-            console.log("Add message : ", entry);
             if (!state.messageMap.has(key)) {
                 state.messageMap.set(key, []);
             }
@@ -57,8 +60,22 @@ export const store = new Vuex.Store({
             // if user is in curRoom
             if (state.curRoom.id === key) {
                 state.curMessages.messages = state.messageMap.get(key);
+            } else {
+                state.user.rooms.forEach(room => {
+                    if (room.id === key) {
+                        room.status = "PUSH_ONLINE";
+                    }
+                })
             }
         },
+        RESET(state, idx) {
+            const room = state.user.rooms[idx];
+            if (room.status === "PUSH_ONLINE") {
+                room.status = "ONLINE";
+            } else if (room.status === "PUSH_OFFLINE") {
+                room.status = "OFFLINE";
+            }
+        }
         // commit + track state changes actions -> mutations
     },
     actions: {
@@ -75,6 +92,14 @@ export const store = new Vuex.Store({
                     state.client.connect(user, commit);
                 })
                 .catch(error => console.log("Couldn't load user:", error));
+
+            axios
+                .get("/api/stats")
+                .then(resp => resp.data)
+                .then(data => {
+                    console.log(data);
+                    state.count = data.count;
+                })
         },
         setCurRoom({commit, state}, room) {
             commit('SET_CUR_ROOM', room);

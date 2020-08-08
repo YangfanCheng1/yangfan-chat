@@ -14,12 +14,12 @@
         <div id="chat-message-form">
             <b-form @submit.prevent="onSubmit">
                 <!-- quill svg taken from https://www.svgrepo.com/svg/88095/quill -->
-                <div class="width-80 inline">
+                <div class="message-bar">
                     <b-input type="text" v-model="content" placeholder="Hello"></b-input>
-                </div><div class="width-20 inline">
-                    <button class="custom-button" type="submit">
-                        <svg id="quill" width="32px" height="32px" viewBox="0 0 363.818 363.818">
-                            <path d="M358.872,0.841c-3.196-1.538-7.014-0.931-9.572,1.526c-19.515,18.728-53.141,46.415-102.511,71.961
+                    <div class="quill">
+                        <button class="custom-button" type="submit">
+                            <svg id="quill" width="32px" height="32px" viewBox="0 0 363.818 363.818">
+                                <path d="M358.872,0.841c-3.196-1.538-7.014-0.931-9.572,1.526c-19.515,18.728-53.141,46.415-102.511,71.961
                                 c-2.159,1.118-3.737,3.106-4.333,5.463c-4.028,15.908-11.933,33.271-23.492,51.607l-4.705,7.462l8.772-38.205
                                 c0.715-3.115-0.378-6.368-2.828-8.42c-2.451-2.052-5.846-2.556-8.786-1.303l-1.015,0.428
                                 C110.79,133.291,81.352,198.24,72.67,233.22c-3.013,12.141-4.516,24.163-4.465,35.738c0.02,4.466,0.272,8.722,0.75,12.705
@@ -28,8 +28,9 @@
                                 c30.935-16.717,65.508-42.37,99.979-74.185c2.832-2.612,3.551-6.805,1.753-10.213c-1.798-3.407-5.662-5.181-9.42-4.315
                                 l-21.363,4.904l7.465-4.706c20.835-13.136,40.313-21.511,57.891-24.897c1.901-0.367,3.622-1.372,4.875-2.849
                                 c41.348-48.75,58.853-96.919,66.256-128.743c2.69-11.567,4.579-23.134,5.607-34.38C363.972,5.742,362.069,2.379,358.872,0.841z"/>
-                        </svg>
-                    </button>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </b-form>
         </div>
@@ -102,13 +103,15 @@ module.exports = {
     margin-top: 10px;
     margin-bottom: 10px;
 }
-.width-80 {
-    width: 95%;
+.message-bar {
+    position: relative;
+    width: 100%;
     display: inline-block;
 }
-.width-20 {
-    display: inline-block;
-    width: 5%
+.quill {
+    position: absolute;
+    right: 0;
+    top: 2px;
 }
 path:hover{
     fill:orange;

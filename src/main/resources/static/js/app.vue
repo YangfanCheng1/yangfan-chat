@@ -17,6 +17,7 @@
                 </b-col>
                 <b-col sm="2">
                     <div class="box-content">
+                        <stat-panel></stat-panel>
                     </div>
                 </b-col>
             </b-row>

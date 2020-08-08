@@ -8,10 +8,12 @@ import com.yangfan.chat.model.dto.MessageDto;
 import com.yangfan.chat.model.dto.RoomDto;
 import com.yangfan.chat.model.dto.UserDto;
 import com.yangfan.chat.model.dto.request.PrivateRoomRegistration;
+import com.yangfan.chat.service.ApplicationEventListener;
 import com.yangfan.chat.service.MessageService;
 import com.yangfan.chat.service.RoomService;
 import com.yangfan.chat.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,7 @@ public class ApiController {
     private final UserService userService;
     private final MessageService messageService;
     private final RoomService roomService;
+    private final ApplicationEventListener applicationEventListener;
 
     // Init user state after sign in
     @GetMapping("/user/{username}")
@@ -83,12 +86,13 @@ public class ApiController {
                 .isPrivate(true).build();
     }
 
-    /*-- No longer used --*/
-
-    @Deprecated
-    @GetMapping(path = "/all-users")
-    public List<User> getAll() {
-        return userService.getAllUsers();
+    @GetMapping("stats")
+    public StatsResponse getNumberOfUsers(){
+        return new StatsResponse(applicationEventListener.getSize());
     }
 
+    @Value
+    private static class StatsResponse {
+        int count;
+    }
 }

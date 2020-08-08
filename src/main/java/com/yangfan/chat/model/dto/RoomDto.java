@@ -22,6 +22,6 @@ public class RoomDto {
         return isPrivate;
     }
 
-    public enum Status {ONLINE, OFFLINE, NONE}
+    public enum Status {ONLINE, OFFLINE, NONE, PUSH_ONLINE, PUSH_OFFLINE}
 
 }
