@@ -1,9 +1,9 @@
 <template>
     <div class="margin-bottom-sm">
         <div class="height-50">
-            <form id="search-user-room-form" method="post" v-on:submit.prevent="onSubmit">
-                <input v-on:keyup="search" v-model="query" name="search-user" class="form-control" placeholder="Search an user">
-            </form>
+            <b-form method="post" v-on:submit.prevent="onSubmit" autocomplete="off">
+                <b-input v-on:keyup="search" v-model="query" name="search-user" placeholder="Search an user"></b-input>
+            </b-form>
         </div>
         <div v-if="isSearchOn" id="user-search-result">
             <div class="rooms">
@@ -17,14 +17,16 @@
         </div>
         <div v-else id="user-subscribed-rooms">
             <div class="rooms">
-                <div @click="setCurRoom(room)"
-                    v-for="room in rooms"
-                    v-bind:key="room.id + room.name"
-                    v-bind:data-id="room.id"
-                    v-bind:data-private="room.isPrivate"
-                    v-bind:data-name="room.name">
-                    <div v-bind:class="['status', getClassOnStatus(room)]"></div>
+                <div @click="setCurRoom(room, idx)"
+                     v-for="(room, idx) in rooms"
+                     :key="idx"
+                     :data-id="room.id"
+                     :data-private="room.isPrivate"
+                     :data-name="room.name"
+                     :class="[{selected: idx === activeIdx}, {'weight-900': hasPush(room.status)}]">
+                    <div v-bind:class="['status', getStatus(room)]"></div>
                     {{room.name}}
+                    <b-badge v-if="hasPush(room.status)" variant="dark" pill>1</b-badge>
                 </div>
             </div>
         </div>
@@ -37,7 +39,8 @@ module.exports = {
         return {
             query: '',
             isSearchOn: false,
-            searchResult: []
+            searchResult: [],
+            activeIdx: null
         }
     },
     methods: {
@@ -86,20 +89,27 @@ module.exports = {
                 })
                 .catch(error => console.log("Couldn't add new room:", error.response.data));
         },
-        setCurRoom: function(room) {
+        setCurRoom: function(room, idx) {
+            this.activeIdx = idx;
             console.log("Switching room: ", room);
+            this.$store.commit('RESET', idx);
             this.$store.dispatch('setCurRoom', room);
             this.$store.dispatch('getMessages', room);
         },
-        getClassOnStatus: function (room) {
+        getStatus: function (room) {
             switch (room.status) {
                 case 'ONLINE':
+                case 'PUSH_ONLINE':
                     return 'online';
                 case 'OFFLINE':
+                case 'PUSH_OFFLINE':
                     return 'offline';
                 default:
                     return '';
             }
+        },
+        hasPush: function (status) {
+            return status === 'PUSH_ONLINE' || status === 'PUSH_OFFLINE';
         },
         init: function() {
             console.log("Mounting left panel");
@@ -117,6 +127,12 @@ module.exports = {
 </script>
 
 <style scoped>
+.selected {
+    background-color: #B0E0E6;
+}
+.weight-900 {
+    font-weight: 900;
+}
 .rooms div:hover {
     background: #f8e7e7;
     cursor: pointer;

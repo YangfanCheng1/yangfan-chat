@@ -204,7 +204,6 @@ h1, h2, h3, h4, h5 {
 .box-content {
   background: white;
   color: #555;
-  font-family: 'Roboto', sans-serif;;
   padding: 30px;
   margin-top: 30px;
 }
@@ -491,34 +490,6 @@ h1, h2, h3, h4, h5 {
   text-align: center;
   color: #333333;
   background: #dddddd;
-}
-.about-social a:hover {
-  background: #5cb48e;
-  color: white;
-}
-
-
-#past-projects a:hover{
-  background: #5cb48e;
-  color:whtie;
-}
-
-.progess-bars span {
-  font-size: 13px;
-  color: #5cb48e;
-}
-
-.progress {
-  height: 10px;
-  border-radius: 0;
-  box-shadow: none;
-  background: #e8f4ef;
-  margin-bottom: 10px;
-}
-
-.progress-bar {
-  box-shadow: none;
-  background: #5cb48e;
 }
 
 /*------ projects ------ */

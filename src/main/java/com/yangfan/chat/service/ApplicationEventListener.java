@@ -70,4 +70,8 @@ public class ApplicationEventListener {
     public RoomDto.Status getStatus(String userName) {
         return this.getLoggedInUsers().containsKey(userName) ? ONLINE : OFFLINE;
     }
+
+    public int getSize() {
+        return this.getLoggedInUsers().size();
+    }
 }
