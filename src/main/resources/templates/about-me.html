@@ -15,8 +15,6 @@
     <!-- fonts -->
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
-    <!-- axios -->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     <!-- vuejs -->
     <!-- development version, includes helpful console warnings -->
@@ -34,6 +32,7 @@
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+    <script src="/app.js" type="module"></script>
 
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/components.css">
@@ -42,13 +41,19 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
 
 </head>
+
 <body>
 
-    <div id="app">
-        <app></app>
+<div id="app">
+    <div id="header" class="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Yangfan's Chat</a>
+        </nav>
     </div>
+    <about></about>
+</div>
 
 </body>
 
-<script src="/app.js" type="module"></script>
+
 </html>

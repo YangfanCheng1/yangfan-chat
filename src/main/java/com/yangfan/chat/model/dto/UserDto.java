@@ -2,13 +2,14 @@ package com.yangfan.chat.model.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Value;
 
 import java.util.List;
 
-@Data
+@Value
 @Builder
 public class UserDto {
-    private int id;
-    private String name;
-    private List<RoomDto> rooms;
+    int id;
+    String name;
+    List<RoomDto> rooms;
 }

@@ -35,6 +35,12 @@ public class WebController {
         return "index";
     }
 
+    @GetMapping("/about-me")
+    public String aboutMe(Model model) {
+        model.addAttribute("appName", "Yangfan's Chat");
+        return "about-me";
+    }
+
     @GetMapping(value = {"/sign-up", "/sign-up.html"})
     public String signUp(Model model) {
         UserRegistrationDto userRegistrationDto = new UserRegistrationDto();

@@ -8,7 +8,7 @@
 
             <div class="navbar-collapse collapse" id="navbarNavDropdown">
                 <ul class="nav navbar-nav mr-auto justify-content-center">
-                    <li><a href="#">About This Project</a></li>
+                    <li><a href="/about-me">About Me</a></li>
                     <li><a href="#">Tools</a></li>
                     <li><a href="#">Contact Me</a></li>
 
