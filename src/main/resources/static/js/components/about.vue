@@ -4,6 +4,17 @@
             <b-col col lg="2"></b-col>
             <b-col cols="8">
                 <div class="box-content">
+                    <div class="links">
+                        <a href="https://github.com/YangfanCheng1">
+                            <i class="fa fa-github fa-2x" aria-hidden="true"></i>
+                        </a>
+                        <a href="https://stackoverflow.com/users/4493352">
+                            <i class="fa fa-stack-overflow fa-2x" aria-hidden="true"></i>
+                        </a>
+                        <a href="#">
+                            <i class="fa fa-linkedin-square fa-2x" aria-hidden="true"></i>
+                        </a>
+                    </div>
                     <h3>About</h3>
                     <p>
                         This project was my first attempt at building a chat-like application. Some of technologies I have incorporated in
@@ -13,7 +24,7 @@
                     </p>
                     <h3>Skill Breakdown</h3>
                     <b-progress :max="max" class="mb-3">
-                        <b-progress-bar :value="90">Spring Boot</b-progress-bar>
+                        <b-progress-bar :value="90">Spring/Spring Boot</b-progress-bar>
                     </b-progress>
                     <b-progress :max="max" class="mb-3">
                         <b-progress-bar :value="80">Java</b-progress-bar>
@@ -36,7 +47,11 @@
 
 <script>
 module.exports = {
-
+    data() {
+        return {
+            max: 100
+        }
+    }
 }
 </script>
 
@@ -54,5 +69,24 @@ p {
 
 .heavy {
     font-weight: bolder;
+}
+.fa-stack-overflow:hover {
+    color: orange;
+    cursor: pointer;
+}
+.fa-github:hover {
+    color: gray;
+    cursor: pointer;
+}
+.fa-linkedin-square:hover {
+    color: #0077b5;
+    cursor: pointer;
+}
+.links {
+    text-align: center;
+}
+.fa {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 </style>

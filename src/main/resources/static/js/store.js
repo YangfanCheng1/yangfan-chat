@@ -81,7 +81,7 @@ export const store = new Vuex.Store({
     actions: {
         init({commit, state, dispatch}) {
             axios
-                .get("/api/user")
+                .get("/api/users")
                 .then(res => res.data)
                 .then(user => {
                     console.log("Init user: ");
@@ -113,7 +113,7 @@ export const store = new Vuex.Store({
         getMessages({commit, state}, room) {
             const roomId = room.id;
             if (!state.messageMap.has(roomId)) {
-                const url = `/api/room/${roomId}/messages`;
+                const url = `/api/rooms/${roomId}/messages`;
                 state.load = !state.load;
                 axios
                     .get(url)
