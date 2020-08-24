@@ -44,10 +44,10 @@ public class ApiController {
 
     // Init user state after sign in
     @GetMapping("/user/{username}")
-    public ResponseEntity<UserDto> getUser(@PathVariable String username) throws UserNotFoundException {
+    public UserDto getUser(@PathVariable String username) throws UserNotFoundException {
         val userDto = userService.getUserDtoByUsername(username);
         log.info("Getting {}", userDto);
-        return ResponseEntity.ok(userDto);
+        return userDto;
     }
 
     @GetMapping("/user")

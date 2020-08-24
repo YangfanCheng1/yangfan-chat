@@ -9,7 +9,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableCaching
 @EnableAsync
 @SpringBootApplication
-@EnableJpaAuditing
 public class PlaygroundApplication {
 
 	public static void main(String[] args) {
