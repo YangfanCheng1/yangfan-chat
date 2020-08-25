@@ -60,6 +60,7 @@ module.exports = {
             };
 
             this.$store.dispatch('sendMessage', message);
+            this.content = '';
         },
         align: function(id) {
             return (id !== this.user.id ? 'orange' : 'blue') + "-background"

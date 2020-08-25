@@ -2,8 +2,6 @@ package com.yangfan.chat.controller;
 
 import com.yangfan.chat.exception.DuplicatePrivateRoomException;
 import com.yangfan.chat.exception.UserNotFoundException;
-import com.yangfan.chat.model.dao.Room;
-import com.yangfan.chat.model.dao.User;
 import com.yangfan.chat.model.dto.MessageDto;
 import com.yangfan.chat.model.dto.RoomDto;
 import com.yangfan.chat.model.dto.UserDto;
@@ -17,7 +15,7 @@ import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,13 +25,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("api")
 @RequiredArgsConstructor
 public class ApiController {
 
@@ -42,48 +39,34 @@ public class ApiController {
     private final RoomService roomService;
     private final ApplicationEventListener applicationEventListener;
 
-    // Init user state after sign in
-    @GetMapping("/user/{username}")
+    @GetMapping("users/{username}")
     public UserDto getUser(@PathVariable String username) throws UserNotFoundException {
-        val userDto = userService.getUserDtoByUsername(username);
-        log.info("Getting {}", userDto);
-        return userDto;
+        return userService.getUserDtoByUsername(username);
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<UserDto> initUser(Principal principal) throws UserNotFoundException {
+    @GetMapping("users")
+    public UserDto initUser(Principal principal) throws UserNotFoundException {
         val username = principal.getName();
-        val userDto = userService.getUserDtoByUsername(username);
-        log.info("Getting {}", userDto);
-        return ResponseEntity.ok(userDto);
+        return userService.getUserDtoByUsername(username);
     }
 
-    @GetMapping("/users")
-    public List<UserDto> getUsersContaining(@RequestParam(value = "keyword") String searchedTerm, Principal principal) {
-        log.info("Searching (text={}, user={})", searchedTerm, principal.getName());
+    @GetMapping("users/search")
+    public List<UserDto> getUsersContaining(@RequestParam(value = "keyword") String searchedTerm,
+                                            Principal principal) {
         return userService.getUsersContaining(searchedTerm, principal.getName());
     }
 
-    @GetMapping("/room/{roomId}/messages")
+    @GetMapping("rooms/{roomId}/messages")
     public List<MessageDto> getMessagesByRoom(@RequestParam(required = false) Integer size,
                                               @PathVariable Integer roomId) {
-        log.info("Getting messages (room={})", roomId);
         return messageService.getMessagesByRoomId(roomId);
     }
 
-    @PostMapping("/room")
+    @PostMapping("rooms")
     @ResponseStatus(HttpStatus.CREATED)
-    public RoomDto addNewRoom(@Valid @RequestBody PrivateRoomRegistration privateRoomRegistration)
+    public RoomDto addNewRoom(@Validated @RequestBody PrivateRoomRegistration privateRoomRegistration)
             throws UserNotFoundException, DuplicatePrivateRoomException {
-        UserDto fromUser = privateRoomRegistration.getFromUser();
-        UserDto toUser = privateRoomRegistration.getToUser();
-        log.info("Creating new room for user '{}' and '{}'", fromUser.getName(), toUser.getName());
-
-        Room savedRoom = roomService.addRoom(privateRoomRegistration);
-        return RoomDto.builder()
-                .id(savedRoom.getRoomId())
-                .name(toUser.getName())
-                .isPrivate(true).build();
+        return roomService.addRoom(privateRoomRegistration);
     }
 
     @GetMapping("stats")

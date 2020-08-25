@@ -42,10 +42,10 @@ public class UserService {
     private final ApplicationEventListener eventListener;
 
     public UserDto getUserDtoByUsername(String username) throws UserNotFoundException {
-        User user = userRepository
+        val user = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
-        List<RoomDto> roomDtos = Stream.of(privateRoomRepository.findByUser(user), user.getRooms())
+        val roomDtos = Stream.of(privateRoomRepository.findByUser(user), user.getRooms())
                 .flatMap(Collection::stream)
                 .map(room -> convertToRoomDto(room, user))
                 .collect(Collectors.toList());
@@ -77,13 +77,9 @@ public class UserService {
         }
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
     public List<UserDto> getUsersContaining(String text, String curUserName) {
-        List<User> users = userRepository.findOtherUsers(text, curUserName);
-        return users.stream()
+        return userRepository.findOtherUsers(text, curUserName)
+                .stream()
                 .filter(user -> !user.getUsername().equals(curUserName))
                 .map(user -> UserDto.builder()
                         .id(user.getId())
@@ -93,17 +89,19 @@ public class UserService {
     }
 
     public void addNewUser(UserRegistrationDto userRegistrationDto) throws DuplicateUserException {
-        String username = userRegistrationDto.getUsername();
+        val username = userRegistrationDto.getUsername();
         if (userRepository.existsByUsername(username)) {
             throw new DuplicateUserException(username);
         }
 
-        User newUser = new User();
-        PublicRoom allRoom = publicRoomRepository.findByRoomName("All").orElseGet(this::initAllChatRoom);
-        newUser.setUsername(username);
-        newUser.setPassword(passwordEncoder.encode(userRegistrationDto.getPassword()));
-        newUser.setEmail(userRegistrationDto.getEmail());
-        newUser.setRooms(Collections.singletonList(allRoom));
+        val allRoom = publicRoomRepository.findByRoomName("All")
+                .orElseGet(this::initAllChatRoom);
+        val newUser = User.builder()
+                .username(username)
+                .password(passwordEncoder.encode(userRegistrationDto.getPassword()))
+                .email(userRegistrationDto.getEmail())
+                .rooms(Collections.singletonList(allRoom))
+                .build();
 
         allRoom.getUsers().add(newUser);
         publicRoomRepository.save(allRoom);

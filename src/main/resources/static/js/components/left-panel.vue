@@ -48,7 +48,7 @@ module.exports = {
             if (this.query.length > 0) {
                 this.isSearchOn = true;
                 axios
-                    .get("/api/users?keyword=" + this.query)
+                    .get("/api/users/search?keyword=" + this.query)
                     .then(res => res.data)
                     .then(data => (this.searchResult = data))
                     .catch(error => console.error("Couldn't load search:", error));
@@ -79,7 +79,7 @@ module.exports = {
             };
 
             axios
-                .post("/api/room", data, headers)
+                .post("/api/rooms", data, headers)
                 .then(res => res.data)
                 .then(room => {
                     // i.e {id: 8, name: "user7", isPrivate: true}
