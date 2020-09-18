@@ -15,7 +15,11 @@ Main modules used are directly provided out of box by Spring
 registration, login and logout flow
 ### example usage & screenshots
 To simulate multiple user sessions as a single user: 
+
 * Create an user in any browser
+
 ![alt text](images/sample1.PNG)
-* Create a different user in a different browser or have another session in an incognito window. 
+
+* Create a different user in a different browser or have another session in an incognito window.
+ 
 ![alt text](images/sample2.PNG)
