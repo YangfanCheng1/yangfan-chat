@@ -1,35 +1,34 @@
 <template>
     <div>
-        <navbar></navbar>
-        <b-container fluid class="font-md">
-            <!-- header/navbar -->
-            <!-- main container -->
-            <b-row>
-                <b-col sm="2">
-                    <div class="box-content">
-                        <left-panel></left-panel>
-                    </div>
-                </b-col>
-                <b-col sm="8">
-                    <div class="box-content">
-                        <right-panel></right-panel>
-                    </div>
-                </b-col>
-                <b-col sm="2">
-                    <div class="box-content">
-                        <stat-panel></stat-panel>
-                    </div>
-                </b-col>
-            </b-row>
-
-
-        </b-container>
-        <!-- footer -->
-        <div>
-            <div id="loader">
-                <div id="bar"></div>
+        <v-app>
+            <navbar></navbar>
+            <v-main>
+                <v-container fluid class="font-md">
+                    <v-row>
+                        <v-col>
+                            <div class="box-content">
+                                <left-panel></left-panel>
+                            </div>
+                        </v-col>
+                        <v-col cols="8">
+                            <div class="box-content">
+                                <right-panel></right-panel>
+                            </div>
+                        </v-col>
+                        <v-col>
+                            <div class="box-content">
+                                <stat-panel></stat-panel>
+                            </div>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </v-main>
+            <div>
+                <div id="loader">
+                    <div id="bar"></div>
+                </div>
             </div>
-        </div>
+        </v-app>
     </div>
 </template>
 
@@ -88,5 +87,8 @@ module.exports = {
     width: 1%;
     height: 5px;
     background-color: #884aea;
+}
+.theme--light.v-application {
+    background-image: url(../images/bg.svg);
 }
 </style>
