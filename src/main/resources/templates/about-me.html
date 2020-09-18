@@ -34,7 +34,6 @@
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
-    <script src="/app.js" type="module"></script>
 
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/components.css">
@@ -54,7 +53,12 @@
     </div>
     <about></about>
 </div>
-
+    <script>
+        Vue.component('about', httpVueLoader("js/components/about.vue"));
+        var vm = new Vue({
+            el: "#app",
+        });
+    </script>
 </body>
 
 

@@ -1,12 +1,19 @@
 <template>
     <div class="margin-bottom-sm">
         <div class="height-50">
-            <b-form method="post" v-on:submit.prevent="onSubmit" autocomplete="off">
-                <b-input v-on:keyup="search" v-model="query" name="search-user" placeholder="Search an user"></b-input>
-            </b-form>
+            <v-form method="post" v-on:submit.prevent="onSubmit" autocomplete="off">
+                <v-text-field filled dense rounded
+                              v-on:keyup="search"
+                              v-model="query"
+                              name="search-user"
+                              placeholder="Search an user"
+                              hide-details
+                              append-icon="mdi-magnify">
+                </v-text-field>
+            </v-form>
         </div>
         <div v-if="isSearchOn" id="user-search-result">
-            <div class="rooms">
+            <div v-if="searchResult.length" class="rooms">
                 <div @click="addRoom(user.id, user.name)"
                     v-for="user in searchResult"
                     v-bind:key="user.id"
@@ -14,6 +21,7 @@
                     v-bind:data-private="true"
                     v-bind:data-name="user.name">{{user.name}}</div>
             </div>
+            <div v-else>no user found..</div>
         </div>
         <div v-else id="user-subscribed-rooms">
             <div class="rooms">
@@ -26,7 +34,7 @@
                      :class="[{selected: idx === activeIdx}, {'weight-900': hasPush(room.status)}]">
                     <div v-bind:class="['status', getStatus(room)]"></div>
                     {{room.name}}
-                    <b-badge v-if="hasPush(room.status)" variant="dark" pill>1</b-badge>
+                    <v-badge v-if="hasPush(room.status)" pill inline dark content="1" dot></v-badge>
                 </div>
             </div>
         </div>
@@ -128,16 +136,19 @@ module.exports = {
 
 <style scoped>
 .selected {
-    background-color: #B0E0E6;
+    background-color: #c1d6ff;
+    border-radius: 10px;
 }
 .weight-900 {
     font-weight: 900;
 }
 .rooms div:hover {
-    background: #f8e7e7;
+    background-color: #f8e7e7;
     cursor: pointer;
+    border-radius: 10px;
 }
 .status {
+    margin-left: 5px;
     width: 10px;
     height: 10px;
     display: inline-block;
@@ -154,6 +165,7 @@ module.exports = {
 .none {
 
 }
+
 .background-none {
     background: none;
 }

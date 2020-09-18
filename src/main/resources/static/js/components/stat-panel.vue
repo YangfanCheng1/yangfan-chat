@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="ch">Number of Users Online</div>
-        <div class="purple center">
+        <div class="center">
             {{count+1}}
         </div>
     </div>

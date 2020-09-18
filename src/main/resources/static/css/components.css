@@ -1,8 +1,3 @@
-/*==== colors ====*/
-black {
-    color: black;
-}
-
 input.button {
   width: auto;
   color: white;
@@ -18,27 +13,6 @@ input.button {
   font-size: 15px;
   padding: 10px 10px;
   font-family: 'Roboto', sans-serif;
-}
-
-.opaque-8 {
-  opacity: 0.8;
-}
-
-.max-height-50vh {
-  height: 50vh;
-  padding: 10px;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.max-height-50 {
-  height: 50px;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.right-align {
-  text-align: right;
 }
 
 .border-top-sm {

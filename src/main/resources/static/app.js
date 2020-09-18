@@ -9,6 +9,12 @@ Vue.component('about', httpVueLoader("js/components/about.vue"));
 var vm = new Vue({
     el: '#app',
     store,
+    vuetify: new Vuetify({
+        theme: {
+            themes: {
+            },
+        },
+    }),
     components: {
         'app': httpVueLoader("js/app.vue"),
     },
@@ -18,12 +24,6 @@ var vm = new Vue({
         },
         getUserName() {
             return this.$store.state.user.name;
-        },
-        getUserRooms() {
-            return this.$store.state.user.rooms;
-        },
-        getCurRoom() {
-            return this.$store.state.curRoom;
         }
     },
     created() {

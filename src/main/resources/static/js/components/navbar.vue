@@ -15,7 +15,7 @@
                 </ul>
                 <ul class="nav navbar-nav mr-auto justify-content-center">
                     <li class="justify-content-end dropdown">
-                        <a id="username" class="white dropdown-toggle" href="#" data-toggle="dropdown">{{ user.name }}</a>
+                        <a id="username" class="dropdown-toggle" href="#" data-toggle="dropdown">{{ user.name }}</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <form class="dropdown-item" action="/log-out" method="post">
                                 <input class="dropdown-item" type="submit" value="Log Out"/>
