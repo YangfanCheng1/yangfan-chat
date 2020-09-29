@@ -2,14 +2,13 @@ package com.yangfan.chat.xml;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.yangfan.buslocator.Api;
 import com.yangfan.buslocator.Buses;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class JacksonXmlTest {
+class JacksonXmlTest {
 
     @SneakyThrows
     @Test
@@ -20,37 +19,36 @@ public class JacksonXmlTest {
         Buses buses = xmlMapper.readValue(payload, Buses.class);
 
         assertThat(buses.getBus()).hasSize(1);
-        assertThat(buses.getBus().get(0)).extracting("id", "fs").contains("5407", "108 NEWARK");
+        assertThat(buses.getBus().get(0)).extracting("id", "fs").contains("5229", "159 NEW YORK");
     }
-
     
-    static String payload = "<?xml version=\"1.0\"?>" +
-            "<buses rt=\"108\" rtRtpiFeedName=\"\" rtdd=\"108\"> <!-- @11 @16 -->" +
-            "   <time>9:28 PM</time>" +
-            "   <bus>" +
-            "       <id>5407</id>" +
-            "       <consist></consist>" +
-            "       <cars></cars>" +
-            "       <rtpiFeedName></rtpiFeedName>" +
-            "       <m>1</m>" +
-            "       <rt>108</rt>" +
-            "       <rtRtpiFeedName></rtRtpiFeedName>" +
-            "       <rtdd>108</rtdd>  " +
-            "       <d>South West Bound</d>" +
-            "       <dd>Newark</dd> " +
-            "       <dn>WSW</dn> " +
-            "       <lat>40.730411529541016</lat>" +
-            "       <lon>-74.12667083740234</lon>" +
-            "       <pid>1706</pid>" +
-            "       <pd>Newark</pd> " +
-            "       <pdRtpiFeedName></pdRtpiFeedName>" +
-            "       <run>4</run>" +
-            "       <fs>108 NEWARK</fs>" +
-            "       <op>483250</op>" +
-            "       <dip>55249</dip>" +
-            "       <bid>112136307</bid>" +
-            "       <wid1>0004</wid1>" +
-            "       <wid2>0108</wid2>" +
-            "   </bus>" +
+    static String payload = "<buses rt=\"159\" rtRtpiFeedName=\"\" rtdd=\"159\">\n" +
+            "<!--  @11 @16  -->\n" +
+            "<time>11:09 AM</time>" +
+            "<bus>" +
+            "<id>5229</id>" +
+            "<consist/>" +
+            "<cars/>" +
+            "<rtpiFeedName/>" +
+            "<m>1</m>" +
+            "<rt>159</rt>" +
+            "<rtRtpiFeedName/>" +
+            "<rtdd>159</rtdd>" +
+            "<d>South West Bound</d>" +
+            "<dd>New York</dd>" +
+            "<dn>SSW</dn>" +
+            "<lat>40.78640653266282</lat>" +
+            "<lon>-74.0182119901063</lon>" +
+            "<pid>1805</pid>" +
+            "<pd>New York</pd>" +
+            "<pdRtpiFeedName/>" +
+            "<run>MAN</run>" +
+            "<fs>159 NEW YORK</fs>" +
+            "<op>519910</op>" +
+            "<dip>22122</dip>" +
+            "<bid>MAN</bid>" +
+            "<wid1>0374</wid1>" +
+            "<wid2>0159</wid2>" +
+            "</bus>" +
             "</buses>";
 }

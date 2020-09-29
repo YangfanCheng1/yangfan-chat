@@ -3,14 +3,13 @@ package com.yangfan.buslocator;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import lombok.Value;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Value
 public class Buses {
 
     @JacksonXmlElementWrapper(useWrapping = false)
-    List<Bus> bus = new ArrayList<>();
+    List<Bus> bus;
 
     @Value
     public static class Bus {

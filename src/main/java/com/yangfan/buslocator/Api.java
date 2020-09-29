@@ -1,6 +1,5 @@
 package com.yangfan.buslocator;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.With;
