@@ -1,10 +1,13 @@
 package com.yangfan.buslocator;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -14,8 +17,8 @@ public class BusService {
     private final BusClient busClient;
 
     List<Api.BusDto> find(String route, String location) {
-        return busClient.getBusesByRoute(route)
-                .getBus()
+        val buses = Optional.ofNullable(busClient.getBusesByRoute(route).getBus()).orElse(Collections.emptyList());
+        return buses
                 .stream()
                 .map(this::convert)
                 .map(busDto -> busDto.withDistance(computeDistance(new BigDecimal(location), busDto.getLat())))
