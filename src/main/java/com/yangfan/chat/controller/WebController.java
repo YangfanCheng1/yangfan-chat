@@ -59,7 +59,7 @@ public class WebController {
             userService.addNewUser(userRegistrationDto);
         } catch (DuplicateUserException e) {
             model.addAttribute("userError", "Username already exists!");
-            return "/sign-up";
+            return "sign-up";
         }
 
         return "redirect:/log-in";

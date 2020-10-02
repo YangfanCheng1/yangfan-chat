@@ -10,7 +10,7 @@
                                 <left-panel></left-panel>
                             </div>
                         </v-col>
-                        <v-col cols="8">
+                        <v-col cols="12" sm="8">
                             <div class="box-content">
                                 <right-panel></right-panel>
                             </div>
