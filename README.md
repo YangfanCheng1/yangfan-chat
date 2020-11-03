@@ -1,19 +1,31 @@
 # yangfan-chat
 An experimental chat-app with features such as user account flow, private chatting, and 
 room chatting (not yet available).
-###  backend
+
+## Get Started
+A typical Spring Boot set up with Maven as build tool:
+```
+$ mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+###  Backend
+
 Main modules used are directly provided out of box by Spring
 * Spring Boot
 * Spring WebSocket
 * Spring Redis (User Session Storage)
 * Spring JPA (MySQL)
 * etc
-### frontend
-* Vue, with VueX and VueRouter (failed to incorporate for SPA)
+
+### Frontend
+
+* Vue, with VueX and VueRouter
 * BoostrapVue (Migrating to Vuetify)
 * Spring MVC with thymeleaf to go hand in hand with Spring Security to control user
 registration, login and logout flow
-### example usage & screenshots
+
+### Example usage & screenshots
+
 To simulate multiple user sessions as a single user: 
 
 * Create an user in any browser
