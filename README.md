@@ -20,7 +20,7 @@ Main modules used are directly provided out of box by Spring
 ### Frontend
 
 * Vue, with VueX and VueRouter
-* BoostrapVue (Migrating to Vuetify)
+* Vuetify
 * Spring MVC with thymeleaf to go hand in hand with Spring Security to control user
 registration, login and logout flow
 
