@@ -19,8 +19,7 @@
                     <p>
                         This project was my first attempt at building a chat-like application. Some of technologies I have incorporated in
                         this project are Spring Websocket, Spring MVC, Spring Redis (as session storage), & Spring JPA using MySQL. Source
-                        can be found at <a href="https://github.com/YangfanCheng1/yangfan-chat" class="purple heavy">github</a>,
-                        although it's not up to date as most of changes are still in my local.
+                        can be found at <a href="https://github.com/YangfanCheng1/yangfan-chat" class="purple heavy">github</a>
                     </p>
                     <h3>Skill Breakdown</h3>
                     <b-progress :max="max" class="mb-3">
