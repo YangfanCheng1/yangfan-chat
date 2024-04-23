@@ -85,6 +85,7 @@ public class UserService {
                         .id(user.getId())
                         .name(user.getUsername())
                         .build())
+                .limit(18)
                 .collect(Collectors.toList());
     }
 
