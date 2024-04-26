@@ -23,10 +23,7 @@
                         A lot of what I use during day-to-day job is very much language/framework specific,
                         but I spent a lot of time in gaining advanced knowledge about various subjects even if they may not directly be used at work.
                         My focus is on continually challenging myself with new emerging technologies in order to build applications on them.
-                        My recent interests are in Reactor, RSocket and anything AI related subjects like LLMs (Don't fight the trend!)
-                        This project was my first attempt at building a chat-like application. Some of technologies I have incorporated in
-                        this project are Spring Websocket, Spring MVC, Spring Redis (as session storage), & Spring JPA using MySQL. Source
-                        can be found at <a href="https://github.com/YangfanCheng1/yangfan-chat" class="purple heavy">github</a>
+                        My recent interests are in Reactor, RSocket and anything AI related subjects like LLMs.
                     </p>
                     <h3>Skill Breakdown</h3>
                     <b-progress :max="max" class="mb-3">

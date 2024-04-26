@@ -23,7 +23,6 @@ public class Message implements Cloneable {
     private int id;
 
     @NotEmpty
-    @SafeHtml(whitelistType = SafeHtml.WhiteListType.NONE)
     @Column(length = 510, columnDefinition = "text")
     private String message;
 

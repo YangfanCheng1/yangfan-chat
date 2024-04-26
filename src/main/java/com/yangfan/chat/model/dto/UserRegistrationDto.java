@@ -10,7 +10,6 @@ import javax.validation.constraints.NotBlank;
 public class UserRegistrationDto {
 
     @NotBlank
-    @SafeHtml(whitelistType = SafeHtml.WhiteListType.NONE) /* Strip all html */
     String username;
 
     @NotBlank
